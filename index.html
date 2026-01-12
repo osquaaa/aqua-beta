@@ -8,7 +8,7 @@
   <meta name="color-scheme" content="dark" />
   <title>Water Tracker • Deep Ocean Cyberpunk</title>
 
-  <!-- Единственная внешняя зависимость: Google Fonts -->
+  <!-- Google Font (единственная внешняя зависимость) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
@@ -24,15 +24,9 @@
       --stroke: rgba(120, 245, 255, .18);
       --stroke2: rgba(120, 245, 255, .10);
 
-      /* Accent palette (cyan default) */
-      --accent: #62f6ff;
-      --accent2:#1ad7ff;
-      --accent3:#00a9ff;
-
-      /* Alert palette (red override via body.alert) */
-      --alert: #ff3b6b;
-      --alert2:#ff2a2a;
-      --alert3:#ff7a00;
+      --cyan: #62f6ff;
+      --cyan2:#1ad7ff;
+      --cyan3:#00a9ff;
 
       --txt: rgba(232, 251, 255, .92);
       --muted: rgba(232, 251, 255, .62);
@@ -43,28 +37,10 @@
       --r: 22px;
       --r2: 28px;
 
-      --p: 0;              /* 0..100 */
-      --parx: 0px;
-      --pary: 0px;
-      --tilt: 0deg;
-
-      --accentSoft: rgba(98,246,255,.22);
-      --accentStroke: rgba(98,246,255,.28);
-      --accentGlow: 0 0 18px rgba(98, 246, 255, .40), 0 0 52px rgba(26, 215, 255, .18);
-
-      --dangerSoft: rgba(255,59,107,.20);
-      --dangerStroke: rgba(255,59,107,.30);
-      --dangerGlow: 0 0 18px rgba(255,59,107,.35), 0 0 52px rgba(255,42,42,.18);
-    }
-
-    body.alert{
-      --accent: var(--alert);
-      --accent2: var(--alert2);
-      --accent3: var(--alert3);
-      --glow: var(--dangerGlow);
-      --accentSoft: var(--dangerSoft);
-      --accentStroke: var(--dangerStroke);
-      --accentGlow: var(--dangerGlow);
+      --p: 0;              /* 0..100 (уровень для визуализации) */
+      --parx: 0px;         /* параллакс X */
+      --pary: 0px;         /* параллакс Y */
+      --tilt: 0deg;        /* микро-поворот */
     }
 
     *{ box-sizing: border-box; }
@@ -83,7 +59,7 @@
       user-select: none;
     }
 
-    /* ===== Live Background ===== */
+    /* ===== Live Background (Deep Ocean Cyberpunk) ===== */
     .bg{
       position: fixed;
       inset: 0;
@@ -92,11 +68,7 @@
       transform: translate3d(var(--parx), var(--pary), 0) rotate(var(--tilt));
       transform-origin: 50% 50%;
       will-change: transform;
-      transition: filter 260ms ease;
-      filter: saturate(1.0);
     }
-    body.alert .bg{ filter: saturate(1.35) contrast(1.05); }
-
     .bg::before,
     .bg::after{
       content:"";
@@ -106,33 +78,35 @@
       opacity: .95;
     }
 
+    /* base flow */
     .bg::before{
       background:
-        radial-gradient(900px 700px at 30% 20%, color-mix(in oklab, var(--accent) 22%, transparent), transparent 60%),
-        radial-gradient(700px 550px at 70% 70%, color-mix(in oklab, var(--accent2) 18%, transparent), transparent 58%),
-        radial-gradient(1000px 800px at 40% 90%, color-mix(in oklab, var(--accent3) 16%, transparent), transparent 62%),
+        radial-gradient(900px 700px at 30% 20%, rgba(98,246,255,.16), transparent 60%),
+        radial-gradient(700px 550px at 70% 70%, rgba(26,215,255,.12), transparent 58%),
+        radial-gradient(1000px 800px at 40% 90%, rgba(0,169,255,.10), transparent 62%),
         conic-gradient(from 240deg at 50% 50%,
-          color-mix(in oklab, var(--accent) 18%, transparent),
+          rgba(98,246,255,.14),
           rgba(0,0,0,0),
-          color-mix(in oklab, var(--accent2) 14%, transparent),
+          rgba(26,215,255,.10),
           rgba(0,0,0,0),
-          color-mix(in oklab, var(--accent3) 14%, transparent),
+          rgba(0,169,255,.10),
           rgba(0,0,0,0),
-          color-mix(in oklab, var(--accent) 16%, transparent)
+          rgba(98,246,255,.12)
         );
       animation: drift 14s ease-in-out infinite;
       mix-blend-mode: screen;
     }
 
+    /* caustics-ish shimmer */
     .bg::after{
       background:
         repeating-radial-gradient(circle at 20% 30%,
-          color-mix(in oklab, var(--accent) 10%, transparent) 0 8px,
+          rgba(98,246,255,.06) 0 8px,
           rgba(0,0,0,0) 10px 24px),
         repeating-radial-gradient(circle at 80% 70%,
-          color-mix(in oklab, var(--accent2) 8%, transparent) 0 6px,
+          rgba(26,215,255,.05) 0 6px,
           rgba(0,0,0,0) 8px 22px),
-        radial-gradient(1200px 900px at 50% 50%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 68%);
+        radial-gradient(1200px 900px at 50% 50%, rgba(98,246,255,.10), transparent 68%);
       opacity: .25;
       animation: shimmer 10s linear infinite;
       transform: translate3d(calc(var(--parx) * -0.25), calc(var(--pary) * -0.25), 0);
@@ -154,52 +128,47 @@
       z-index: 1;
       min-height: 100dvh;
       display: grid;
-      grid-template-rows: auto auto 1fr auto;
+      grid-template-rows: auto 1fr auto;
       padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
-      gap: 12px;
+      gap: 14px;
     }
 
     .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 10px;
-      padding: 10px 8px 4px;
+      padding: 10px 8px;
     }
-
     .brand{
       display:flex;
       align-items:center;
       gap: 10px;
       opacity:.95;
-      min-width: 0;
     }
     .brand__mark{
       width: 34px; height: 34px;
       border-radius: 12px;
       background:
-        radial-gradient(12px 12px at 30% 30%, color-mix(in oklab, var(--accent) 70%, transparent), color-mix(in oklab, var(--accent) 18%, transparent) 55%, rgba(0,0,0,0) 70%),
-        linear-gradient(135deg, color-mix(in oklab, var(--accent) 24%, transparent), rgba(10,18,40,.1));
+        radial-gradient(12px 12px at 30% 30%, rgba(98,246,255,.65), rgba(98,246,255,.12) 55%, rgba(0,0,0,0) 70%),
+        linear-gradient(135deg, rgba(98,246,255,.25), rgba(10,18,40,.1));
       border: 1px solid var(--stroke);
-      box-shadow: var(--accentGlow);
+      box-shadow: var(--glow);
       position: relative;
       overflow:hidden;
-      flex: 0 0 auto;
     }
     .brand__mark::after{
       content:"";
       position:absolute;
       inset:-30%;
       background: conic-gradient(from 180deg,
-        rgba(0,0,0,0),
-        color-mix(in oklab, var(--accent) 18%, transparent),
-        rgba(0,0,0,0));
+        rgba(98,246,255,.0),
+        rgba(98,246,255,.18),
+        rgba(98,246,255,.0));
       animation: spin 4.8s linear infinite;
       opacity:.75;
     }
     @keyframes spin{ to{ transform: rotate(360deg); } }
 
-    .brand__text{ min-width: 0; }
     .brand__name{
       font-family: "Orbitron", sans-serif;
       letter-spacing: .06em;
@@ -208,21 +177,15 @@
       color: rgba(232, 251, 255, .88);
       text-transform: uppercase;
       line-height: 1.1;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
     }
     .brand__sub{
       font-size: 12px;
       color: var(--muted);
       margin-top: 2px;
       letter-spacing: .02em;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
     }
 
-    .pill{
+    .hint{
       display:flex;
       align-items:center;
       gap: 8px;
@@ -235,81 +198,21 @@
       color: rgba(232, 251, 255, .70);
       font-size: 12px;
       box-shadow: 0 10px 32px rgba(0,0,0,.35);
-      flex: 0 0 auto;
     }
-    .pill svg{ opacity:.85; }
-    body.alert .pill{
-      border-color: color-mix(in oklab, var(--accent) 30%, rgba(120,245,255,.10));
-      box-shadow: 0 10px 32px rgba(0,0,0,.35), 0 0 24px color-mix(in oklab, var(--accent) 22%, transparent);
-    }
+    .hint svg{ opacity:.8; }
 
-    .microbar{
-      display:flex;
-      align-items:stretch;
-      justify-content:space-between;
-      gap: 10px;
-      padding: 0 6px;
-    }
-    .microcard{
-      flex: 1;
-      border-radius: 18px;
-      border: 1px solid rgba(120,245,255,.12);
-      background: rgba(10,18,40,.18);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 16px 46px rgba(0,0,0,.35);
-      padding: 10px 12px;
-      min-width: 0;
-      transition: border-color 220ms ease, box-shadow 240ms ease;
-    }
-    body.alert .microcard{
-      border-color: color-mix(in oklab, var(--accent) 28%, rgba(120,245,255,.10));
-      box-shadow: 0 16px 46px rgba(0,0,0,.35), 0 0 30px color-mix(in oklab, var(--accent) 14%, transparent);
-    }
-    .microtop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-    .microtitle{
-      font-family:"Orbitron", sans-serif;
-      font-size: 11px;
-      letter-spacing:.06em;
-      color: rgba(232,251,255,.70);
-      text-transform: uppercase;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-    .microvalue{
-      font-size: 14px;
-      color: rgba(232,251,255,.90);
-      font-weight: 700;
-      letter-spacing: .02em;
-      white-space: nowrap;
-    }
-    .microhint{
-      font-size: 12px;
-      color: rgba(232,251,255,.58);
-      line-height: 1.25;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* ===== Gauge ===== */
     .center{
       display:grid;
       place-items:center;
-      padding: 8px 0 0;
+      padding: 10px 0;
     }
+
+    /* ===== Gauge (Glass + Water) ===== */
     .gauge-wrap{
       width: min(420px, 100%);
       display:grid;
       place-items:center;
-      gap: 16px;
+      gap: 18px;
     }
 
     .gauge{
@@ -326,16 +229,16 @@
       border-radius: 999px;
       background:
         radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 56%, rgba(0,0,0,.55) 72%, rgba(0,0,0,0) 78%),
-        conic-gradient(from -90deg,
-          color-mix(in oklab, var(--accent) 96%, white 6%) calc(var(--p) * 1%),
+        conic-gradient(
+          from -90deg,
+          rgba(98,246,255,.95) calc(var(--p) * 1%),
           rgba(120,245,255,.12) 0
         );
       mask: radial-gradient(circle at 50% 50%, transparent 61%, #000 62%);
       -webkit-mask: radial-gradient(circle at 50% 50%, transparent 61%, #000 62%);
-      box-shadow: var(--accentGlow);
+      box-shadow: var(--glow);
       opacity: .95;
       animation: ringPulse 3.6s ease-in-out infinite;
-      transition: filter 240ms ease;
     }
     @keyframes ringPulse{
       0%,100%{ filter: saturate(1.05) brightness(1.0); }
@@ -360,9 +263,9 @@
       top: calc((100 - var(--p)) * 1%);
       transition: top 420ms cubic-bezier(.2,.85,.2,1);
       background:
-        radial-gradient(240px 160px at 30% 20%, color-mix(in oklab, var(--accent) 42%, transparent), color-mix(in oklab, var(--accent) 14%, transparent) 55%, rgba(0,0,0,0) 72%),
-        linear-gradient(180deg, color-mix(in oklab, var(--accent) 18%, transparent), color-mix(in oklab, var(--accent2) 10%, transparent));
-      filter: saturate(1.12);
+        radial-gradient(240px 160px at 30% 20%, rgba(98,246,255,.40), rgba(98,246,255,.12) 55%, rgba(0,0,0,0) 72%),
+        linear-gradient(180deg, rgba(98,246,255,.14), rgba(26,215,255,.08));
+      filter: saturate(1.1);
     }
 
     .wave{
@@ -370,11 +273,11 @@
       inset: -30% -20% -30% -20%;
       opacity: .85;
       background:
-        radial-gradient(18px 12px at 10% 30%, color-mix(in oklab, var(--accent) 36%, transparent), rgba(0,0,0,0) 70%),
-        radial-gradient(18px 12px at 55% 60%, color-mix(in oklab, var(--accent2) 26%, transparent), rgba(0,0,0,0) 70%),
-        radial-gradient(18px 12px at 85% 40%, color-mix(in oklab, var(--accent3) 20%, transparent), rgba(0,0,0,0) 70%),
+        radial-gradient(18px 12px at 10% 30%, rgba(98,246,255,.35), rgba(0,0,0,0) 70%),
+        radial-gradient(18px 12px at 55% 60%, rgba(26,215,255,.26), rgba(0,0,0,0) 70%),
+        radial-gradient(18px 12px at 85% 40%, rgba(0,169,255,.22), rgba(0,0,0,0) 70%),
         repeating-linear-gradient(90deg,
-          color-mix(in oklab, var(--accent) 12%, transparent) 0 26px,
+          rgba(98,246,255,.10) 0 26px,
           rgba(0,0,0,0) 26px 54px);
       transform: translate3d(0,0,0);
       mix-blend-mode: screen;
@@ -406,7 +309,7 @@
       letter-spacing: .04em;
       font-size: clamp(44px, 10vw, 64px);
       line-height: 1;
-      text-shadow: 0 0 26px color-mix(in oklab, var(--accent) 28%, transparent);
+      text-shadow: 0 0 26px rgba(98,246,255,.28);
     }
     .amount{
       margin-top: 10px;
@@ -426,7 +329,7 @@
       align-items:center;
       justify-content:center;
       gap: 14px;
-      margin-top: 2px;
+      margin-top: 4px;
     }
 
     .btn{
@@ -449,14 +352,14 @@
     }
     .btn:active{ transform: translateY(1px) scale(.99); }
     .btn:focus-visible{
-      box-shadow: var(--shadow), 0 0 0 2px color-mix(in oklab, var(--accent) 22%, transparent), var(--accentGlow);
-      border-color: color-mix(in oklab, var(--accent) 35%, rgba(120,245,255,.18));
+      box-shadow: var(--shadow), 0 0 0 2px rgba(98,246,255,.25), var(--glow);
+      border-color: rgba(98,246,255,.35);
     }
 
     .btn--big{
       width: 86px; height: 86px;
-      border-color: var(--accentStroke);
-      box-shadow: var(--shadow), var(--accentGlow), inset 0 1px 0 rgba(255,255,255,.10);
+      border-color: rgba(98,246,255,.28);
+      box-shadow: var(--shadow), var(--glow), inset 0 1px 0 rgba(255,255,255,.10);
       position: relative;
       overflow:hidden;
     }
@@ -465,22 +368,24 @@
       position:absolute;
       inset:-40%;
       background: conic-gradient(from 0deg,
-        rgba(0,0,0,0),
-        color-mix(in oklab, var(--accent) 18%, transparent),
-        rgba(0,0,0,0),
-        color-mix(in oklab, var(--accent2) 12%, transparent),
-        rgba(0,0,0,0));
+        rgba(98,246,255,.00),
+        rgba(98,246,255,.14),
+        rgba(98,246,255,.00),
+        rgba(26,215,255,.10),
+        rgba(98,246,255,.00));
       animation: spin 5.5s linear infinite;
       opacity:.95;
     }
-    .btn--big svg{ position:relative; z-index: 1; filter: drop-shadow(0 0 14px color-mix(in oklab, var(--accent) 35%, transparent)); }
+    .btn--big svg{ position:relative; z-index: 1; filter: drop-shadow(0 0 14px rgba(98,246,255,.35)); }
 
     .btn--small{
       width: 56px; height: 56px;
       border-color: rgba(120,245,255,.18);
       opacity: .92;
     }
+    .btn--small:hover{ border-color: rgba(98,246,255,.30); }
 
+    /* ===== Bottom Nav (subtle) ===== */
     .bottom{
       display:flex;
       align-items:center;
@@ -506,11 +411,9 @@
     .navbtn svg{ opacity:.86; }
     .navbtn:active{ transform: translateY(1px); }
     .navbtn:focus-visible{
-      border-color: color-mix(in oklab, var(--accent) 30%, rgba(120,245,255,.14));
-      box-shadow: 0 14px 42px rgba(0,0,0,.35), 0 0 0 2px color-mix(in oklab, var(--accent) 20%, transparent);
+      border-color: rgba(98,246,255,.30);
+      box-shadow: 0 14px 42px rgba(0,0,0,.35), 0 0 0 2px rgba(98,246,255,.22);
     }
-
-    .safe{ height: max(0px, env(safe-area-inset-bottom)); }
 
     /* ===== Modals ===== */
     .modal{
@@ -520,7 +423,7 @@
       display: grid;
       place-items: center;
       padding: 18px;
-      background: rgba(2, 4, 10, .58);
+      background: rgba(2, 4, 10, .55);
       opacity: 0;
       pointer-events: none;
       transition: opacity 220ms ease;
@@ -530,18 +433,17 @@
       pointer-events: auto;
     }
     .sheet{
-      width: min(560px, 100%);
+      width: min(520px, 100%);
       border-radius: var(--r2);
-      background: linear-gradient(180deg, rgba(10,18,40,.58), rgba(10,18,40,.26));
+      background: linear-gradient(180deg, rgba(10,18,40,.55), rgba(10,18,40,.25));
       border: 1px solid rgba(120,245,255,.18);
-      box-shadow: 0 30px 120px rgba(0,0,0,.70), var(--accentGlow);
+      box-shadow: 0 30px 120px rgba(0,0,0,.70), var(--glow);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       overflow: hidden;
       transform: translateY(10px) scale(.985);
       transition: transform 240ms cubic-bezier(.2,.85,.2,1);
     }
-    body.alert .sheet{ box-shadow: 0 30px 120px rgba(0,0,0,.70), var(--dangerGlow); }
     .modal.is-open .sheet{ transform: translateY(0) scale(1); }
 
     .sheet__head{
@@ -578,7 +480,7 @@
       outline:none;
     }
     .close:active{ transform: translateY(1px); }
-    .close:focus-visible{ border-color: color-mix(in oklab, var(--accent) 30%, rgba(120,245,255,.14)); }
+    .close:focus-visible{ border-color: rgba(98,246,255,.30); }
 
     .sheet__body{
       padding: 16px;
@@ -586,10 +488,13 @@
       gap: 14px;
     }
 
-    .field{ display:grid; gap: 8px; }
+    .field{
+      display:grid;
+      gap: 8px;
+    }
     .label{
       color: rgba(232, 251, 255, .78);
-      font-weight: 700;
+      font-weight: 600;
       letter-spacing: .02em;
       font-size: 13px;
       display:flex;
@@ -615,17 +520,24 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
     }
     .input:focus{
-      border-color: color-mix(in oklab, var(--accent) 30%, rgba(120,245,255,.14));
-      box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 18%, transparent);
+      border-color: rgba(98,246,255,.30);
+      box-shadow: 0 0 0 2px rgba(98,246,255,.16);
     }
     input[type="number"]{ appearance: textfield; }
     input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+    input[type="number"]::-webkit-inner-spin-button{
+      -webkit-appearance: none;
+      margin: 0;
+    }
 
-    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 520px){ .row{ grid-template-columns: 1fr; } }
-
-    .divider{ height: 1px; background: rgba(120,245,255,.10); margin: 4px 0; }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 420px){
+      .row{ grid-template-columns: 1fr; }
+    }
 
     .actions{
       display:flex;
@@ -637,99 +549,33 @@
     .btnline{
       padding: 10px 14px;
       border-radius: 16px;
-      font-weight: 800;
+      font-weight: 700;
       letter-spacing: .02em;
       font-size: 14px;
     }
     .btnline.primary{
-      border-color: var(--accentStroke);
-      box-shadow: 0 18px 60px rgba(0,0,0,.45), 0 0 24px color-mix(in oklab, var(--accent) 22%, transparent);
+      border-color: rgba(98,246,255,.30);
+      box-shadow: 0 18px 60px rgba(0,0,0,.45), 0 0 24px rgba(98,246,255,.24);
     }
     .btnline.danger{
-      border-color: rgba(120,245,255,.14);
+      border-color: rgba(98,246,255,.14);
       opacity: .95;
     }
 
-    /* ===== Segmented ===== */
-    .seg{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .seg button{
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.18);
-      color: rgba(232,251,255,.80);
-      border-radius: 999px;
-      padding: 10px 12px;
-      font-weight: 800;
-      letter-spacing:.02em;
-      font-size: 13px;
-      cursor:pointer;
-      transition: border-color 180ms ease, box-shadow 220ms ease, transform 120ms ease;
-      outline:none;
-    }
-    .seg button:active{ transform: translateY(1px); }
-    .seg button[aria-pressed="true"]{
-      border-color: var(--accentStroke);
-      box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 18%, transparent), 0 0 24px color-mix(in oklab, var(--accent) 20%, transparent);
-      color: rgba(232,251,255,.92);
-    }
-
-    /* ===== Interval editor ===== */
-    .intervals{ display:grid; gap: 10px; }
-    .interval{
-      display:grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 10px;
-      align-items:center;
-      padding: 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(120,245,255,.12);
-      background: rgba(10,18,40,.16);
-    }
-    @media (max-width: 520px){
-      .interval{ grid-template-columns: 1fr 1fr; }
-      .interval .del{ grid-column: 1 / -1; justify-self: end; }
-    }
-    .tinput{
-      display:flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .tinput label{
-      font-family:"Orbitron", sans-serif;
-      font-size: 10px;
-      letter-spacing:.06em;
-      color: rgba(232,251,255,.60);
-      text-transform: uppercase;
-    }
-    .del{
-      width: 42px; height: 42px;
-      border-radius: 16px;
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.18);
-      cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      outline:none;
-      transition: transform 120ms ease, border-color 180ms ease;
-    }
-    .del:active{ transform: translateY(1px); }
-    .del:focus-visible{ border-color: var(--accentStroke); }
-
-    .mini-actions{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap: wrap;
+    .divider{
+      height: 1px;
+      background: rgba(120,245,255,.10);
+      margin: 4px 0;
     }
 
     /* ===== Stats list ===== */
-    .stats{ display:grid; gap: 10px; }
+    .stats{
+      display:grid;
+      gap: 10px;
+    }
     .statrow{
       display:grid;
-      grid-template-columns: 92px 1fr;
+      grid-template-columns: 84px 1fr;
       gap: 12px;
       align-items:center;
       padding: 10px 10px;
@@ -745,7 +591,12 @@
       text-transform: uppercase;
       line-height: 1.25;
     }
-    .date b{ display:block; font-size: 12px; color: rgba(232, 251, 255, .92); margin-top: 2px; }
+    .date b{
+      display:block;
+      font-size: 12px;
+      color: rgba(232, 251, 255, .92);
+      margin-top: 2px;
+    }
     .bar{
       height: 10px;
       border-radius: 999px;
@@ -758,8 +609,8 @@
       display:block;
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 85%, white 6%), color-mix(in oklab, var(--accent3) 55%, transparent));
-      box-shadow: 0 0 18px color-mix(in oklab, var(--accent) 25%, transparent);
+      background: linear-gradient(90deg, rgba(98,246,255,.85), rgba(0,169,255,.55));
+      box-shadow: 0 0 18px rgba(98,246,255,.25);
       border-radius: 999px;
       transition: width 520ms cubic-bezier(.2,.85,.2,1);
     }
@@ -771,78 +622,20 @@
       color: rgba(232, 251, 255, .62);
       font-size: 13px;
     }
-    .meta strong{ color: rgba(232, 251, 255, .90); font-weight: 800; }
-
-    /* ===== Toast ===== */
-    .toast{
-      position: fixed;
-      left: 16px;
-      right: 16px;
-      bottom: max(16px, env(safe-area-inset-bottom));
-      z-index: 20;
-      display:grid;
-      place-items:center;
-      pointer-events:none;
-    }
-    .toast > .card{
-      width: min(560px, 100%);
-      border-radius: 18px;
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.22);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 22px 70px rgba(0,0,0,.55), 0 0 26px color-mix(in oklab, var(--accent) 16%, transparent);
-      padding: 12px 12px;
-      display:flex;
-      align-items:flex-start;
-      gap: 10px;
-      transform: translateY(12px);
-      opacity: 0;
-      transition: opacity 220ms ease, transform 240ms cubic-bezier(.2,.85,.2,1);
-      pointer-events:none;
-    }
-    .toast.show > .card{
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .toast .title{
-      font-family:"Orbitron", sans-serif;
-      letter-spacing:.05em;
-      font-size: 11px;
-      text-transform: uppercase;
-      color: rgba(232,251,255,.86);
-      margin-bottom: 2px;
-    }
-    .toast .msg{
-      font-size: 13px;
-      color: rgba(232,251,255,.70);
-      line-height: 1.25;
-    }
-    .toast .dot{
-      width: 10px; height: 10px; border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 20px color-mix(in oklab, var(--accent) 28%, transparent);
-      margin-top: 4px;
-      flex: 0 0 auto;
+    .meta strong{
+      color: rgba(232, 251, 255, .88);
+      font-weight: 700;
     }
 
-    /* ===== Reminder modal (big) ===== */
-    .remind-actions{
-      display:flex;
-      gap: 10px;
-      justify-content:space-between;
-      flex-wrap: wrap;
-      margin-top: 6px;
-    }
-    .remind-actions .btnline{ flex: 1; justify-content:center; }
-    .remind-actions .btnline.primary{
-      box-shadow: 0 18px 60px rgba(0,0,0,.45), var(--accentGlow);
+    /* subtle footer safe area */
+    .safe{
+      height: max(0px, env(safe-area-inset-bottom));
     }
 
     /* reduce motion */
     @media (prefers-reduced-motion: reduce){
       .bg::before, .bg::after, .ring, .btn--big::before, .wave{ animation: none !important; }
-      .water, .bar > i, .modal, .sheet, .toast > .card{ transition: none !important; }
+      .water, .bar > i, .modal, .sheet{ transition: none !important; }
     }
   </style>
 </head>
@@ -854,42 +647,21 @@
     <div class="topbar">
       <div class="brand">
         <div class="brand__mark" aria-hidden="true"></div>
-        <div class="brand__text">
+        <div>
           <div class="brand__name">Water Tracker</div>
-          <div class="brand__sub" id="subline">Режим по времени • Deep Ocean Cyberpunk</div>
+          <div class="brand__sub" id="subline">Deep Ocean Cyberpunk</div>
         </div>
       </div>
 
-      <button class="pill" id="wakeBtn" type="button" aria-label="Я проснулся">
-        <!-- sunrise icon -->
+      <div class="hint" id="hint">
+        <!-- droplet icon -->
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 3v3" stroke="color-mix(in oklab, var(--accent) 85%, white 10%)" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M4.5 11.5H7.5" stroke="rgba(232,251,255,.72)" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M16.5 11.5h3" stroke="rgba(232,251,255,.72)" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M6.2 6.7l2.1 2.1" stroke="rgba(232,251,255,.60)" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M15.7 8.8l2.1-2.1" stroke="rgba(232,251,255,.60)" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M7 18.2a5 5 0 1 1 10 0" stroke="color-mix(in oklab, var(--accent) 70%, transparent)" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4 19h16" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M12 2C12 2 6 9.2 6 13.8C6 17.8 8.9 21 12 21C15.1 21 18 17.8 18 13.8C18 9.2 12 2 12 2Z"
+                stroke="rgba(98,246,255,.85)" stroke-width="1.6"/>
+          <path d="M9.4 14.1C9.6 16.2 10.9 17.6 12.6 18.1"
+                stroke="rgba(98,246,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
-        <span id="wakeText">Я проснулся</span>
-      </button>
-    </div>
-
-    <div class="microbar" aria-label="План и предупреждения">
-      <div class="microcard">
-        <div class="microtop">
-          <div class="microtitle">Следующий стакан</div>
-          <div class="microvalue" id="nextTime">—</div>
-        </div>
-        <div class="microhint" id="nextHint">Нажми «Я проснулся», чтобы собрать план на сегодня</div>
-      </div>
-
-      <div class="microcard">
-        <div class="microtop">
-          <div class="microtitle">Ограничения</div>
-          <div class="microvalue" id="guardValue">—</div>
-        </div>
-        <div class="microhint" id="guardHint">Таймер и лимиты защищают от «залпом»</div>
+        <span id="hintText">+ добавляет стакан</span>
       </div>
     </div>
 
@@ -913,12 +685,14 @@
 
         <div class="controls" aria-label="Управление">
           <button class="btn btn--small" id="minusBtn" type="button" aria-label="Убавить стакан">
+            <!-- minus icon -->
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M6.5 12H17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </button>
 
           <button class="btn btn--big" id="plusBtn" type="button" aria-label="Добавить стакан">
+            <!-- plus icon -->
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M12 6.5V17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
               <path d="M6.5 12H17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
@@ -930,183 +704,30 @@
 
     <div class="bottom" aria-label="Навигация">
       <button class="navbtn" id="settingsBtn" type="button" aria-label="Настройки">
+        <!-- gear icon -->
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
                 stroke="rgba(232,251,255,.88)" stroke-width="1.6"/>
           <path d="M19.2 12a7.2 7.2 0 0 0-.08-1l2-1.44-1.8-3.12-2.36.82a7.2 7.2 0 0 0-1.72-1l-.36-2.48H10.2l-.36 2.48a7.2 7.2 0 0 0-1.72 1l-2.36-.82-1.8 3.12 2 1.44a7.2 7.2 0 0 0 0 2l-2 1.44 1.8 3.12 2.36-.82c.54.4 1.12.74 1.72 1l.36 2.48h3.6l.36-2.48c.6-.26 1.18-.6 1.72-1l2.36.82 1.8-3.12-2-1.44c.05-.33.08-.66.08-1Z"
-                stroke="color-mix(in oklab, var(--accent) 55%, transparent)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                stroke="rgba(98,246,255,.55)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
 
       <div class="safe" aria-hidden="true"></div>
 
       <button class="navbtn" id="statsBtn" type="button" aria-label="Статистика">
+        <!-- chart icon -->
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5.5 18.5V5.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
           <path d="M5.5 18.5H18.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
           <path d="M8.2 15.2l3-3 2.2 2.2 4.2-5"
-                stroke="color-mix(in oklab, var(--accent) 85%, white 10%)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M8.2 15.2h0" stroke="color-mix(in oklab, var(--accent) 85%, white 10%)" stroke-width="4" stroke-linecap="round"/>
-          <path d="M11.2 12.2h0" stroke="color-mix(in oklab, var(--accent) 85%, white 10%)" stroke-width="4" stroke-linecap="round"/>
-          <path d="M13.4 14.4h0" stroke="color-mix(in oklab, var(--accent) 85%, white 10%)" stroke-width="4" stroke-linecap="round"/>
-          <path d="M17.6 9.4h0" stroke="color-mix(in oklab, var(--accent) 85%, white 10%)" stroke-width="4" stroke-linecap="round"/>
+                stroke="rgba(98,246,255,.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.2 15.2h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M11.2 12.2h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M13.4 14.4h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M17.6 9.4h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
         </svg>
       </button>
-    </div>
-  </div>
-
-  <!-- Toast -->
-  <div class="toast" id="toast" aria-live="polite" aria-atomic="true">
-    <div class="card">
-      <div class="dot" aria-hidden="true"></div>
-      <div>
-        <div class="title" id="toastTitle">Система</div>
-        <div class="msg" id="toastMsg">—</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Wake / Plan Modal -->
-  <div class="modal" id="planModal" role="dialog" aria-modal="true" aria-labelledby="planTitle">
-    <div class="sheet" role="document">
-      <div class="sheet__head">
-        <div class="sheet__title" id="planTitle">
-          <!-- calendar/clock icon -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 3v3" stroke="rgba(232,251,255,.70)" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M17 3v3" stroke="rgba(232,251,255,.70)" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M5 6h14" stroke="color-mix(in oklab, var(--accent) 75%, transparent)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M6 9h12v11H6z" stroke="rgba(232,251,255,.50)" stroke-width="1.3" fill="none"/>
-            <path d="M12 12v4l3 2" stroke="color-mix(in oklab, var(--accent) 75%, transparent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          План на сегодня
-        </div>
-
-        <button class="close" id="planClose" type="button" aria-label="Закрыть">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 7l10 10" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M17 7L7 17" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="sheet__body">
-        <div class="field">
-          <div class="label">
-            <span>Когда у тебя есть возможность пить?</span>
-            <small id="planMeta">Равномерно распределим цель по доступным промежуткам</small>
-          </div>
-          <div style="color: rgba(232,251,255,.62); font-size: 13px; line-height: 1.45;">
-            Добавь 1–3 промежутка (например: до школы, после школы, вечер). Внутри этих окон приложение
-            поставит «точки питья» и будет напоминать, если ты отстаёшь.
-          </div>
-        </div>
-
-        <div class="mini-actions">
-          <div class="seg" role="group" aria-label="Быстрые шаблоны">
-            <button type="button" class="tpl" data-tpl="school" aria-pressed="false">Школа 08–15</button>
-            <button type="button" class="tpl" data-tpl="work" aria-pressed="false">Работа 09–18</button>
-            <button type="button" class="tpl" data-tpl="free" aria-pressed="false">Свободен</button>
-          </div>
-
-          <button class="btn btnline" id="addInterval" type="button">
-            <!-- plus icon small -->
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 6.5V17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
-              <path d="M6.5 12H17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            Добавить окно
-          </button>
-        </div>
-
-        <div class="intervals" id="intervals"></div>
-
-        <div class="divider"></div>
-
-        <div class="row">
-          <div class="field">
-            <div class="label">
-              <span>Проснулся</span>
-              <small id="wakeAtLabel">—</small>
-            </div>
-            <input class="input" id="wakeAtInput" type="time" />
-          </div>
-
-          <div class="field">
-            <div class="label">
-              <span>Сон (конец дня)</span>
-              <small>не напоминать после</small>
-            </div>
-            <input class="input" id="sleepAtInput" type="time" />
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field">
-          <div class="label">
-            <span>Оценка плана</span>
-            <small id="planEstimate">—</small>
-          </div>
-          <div style="color: rgba(232,251,255,.62); font-size: 13px; line-height: 1.45;" id="planWarnings">
-            —
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btnline" id="planCancel" type="button">Отмена</button>
-          <button class="btn btnline primary" id="planSave" type="button">Применить план</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Reminder Modal -->
-  <div class="modal" id="remindModal" role="dialog" aria-modal="true" aria-labelledby="remindTitle">
-    <div class="sheet" role="document">
-      <div class="sheet__head">
-        <div class="sheet__title" id="remindTitle">
-          <!-- bell icon -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 21a2.2 2.2 0 0 0 2.2-2.2H9.8A2.2 2.2 0 0 0 12 21Z"
-                  stroke="rgba(232,251,255,.72)" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M18 16H6c1.2-1.2 1.8-2.2 1.8-4.6 0-3 1.7-5.3 4.2-5.9V4.3c0-.8.6-1.3 1.2-1.3s1.2.5 1.2 1.3v1.2c2.5.6 4.2 2.9 4.2 5.9 0 2.4.6 3.4 1.8 4.6Z"
-                  stroke="color-mix(in oklab, var(--accent) 80%, transparent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Время пить
-        </div>
-
-        <button class="close" id="remindClose" type="button" aria-label="Закрыть напоминание">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 7l10 10" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M17 7L7 17" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="sheet__body">
-        <div class="field">
-          <div class="label">
-            <span>Рекомендация сейчас</span>
-            <small id="remindWhen">—</small>
-          </div>
-
-          <div style="color: rgba(232,251,255,.86); font-size: 16px; font-weight: 800; letter-spacing:.02em;" id="remindMain">
-            Выпей стакан
-          </div>
-
-          <div style="color: rgba(232,251,255,.62); font-size: 13px; line-height: 1.45;" id="remindSub">
-            —
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="remind-actions">
-          <button class="btn btnline" id="snoozeBtn" type="button">Отложить на 10 мин</button>
-          <button class="btn btnline primary" id="drinkNowBtn" type="button">Я выпил</button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -1117,17 +738,18 @@
         <div class="sheet__title" id="settingsTitle">
           <!-- sliders icon -->
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 7h10" stroke="color-mix(in oklab, var(--accent) 80%, transparent)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M4 7h10" stroke="rgba(98,246,255,.85)" stroke-width="1.8" stroke-linecap="round"/>
             <path d="M18 7h2" stroke="rgba(232,251,255,.72)" stroke-width="1.8" stroke-linecap="round"/>
             <path d="M4 17h2" stroke="rgba(232,251,255,.72)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M10 17h10" stroke="color-mix(in oklab, var(--accent) 80%, transparent)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M14 7a2 2 0 1 0 0 .01" stroke="color-mix(in oklab, var(--accent) 45%, transparent)" stroke-width="1.6" fill="none"/>
-            <path d="M8 17a2 2 0 1 0 0 .01" stroke="color-mix(in oklab, var(--accent) 45%, transparent)" stroke-width="1.6" fill="none"/>
+            <path d="M10 17h10" stroke="rgba(98,246,255,.85)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M14 7a2 2 0 1 0 0 .01" stroke="rgba(98,246,255,.40)" stroke-width="1.6" fill="none"/>
+            <path d="M8 17a2 2 0 1 0 0 .01" stroke="rgba(98,246,255,.40)" stroke-width="1.6" fill="none"/>
           </svg>
           Настройки
         </div>
 
         <button class="close" id="settingsClose" type="button" aria-label="Закрыть настройки">
+          <!-- X icon -->
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M7 7l10 10" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
             <path d="M17 7L7 17" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
@@ -1140,7 +762,7 @@
           <div class="field">
             <div class="label">
               <span>Вес (кг)</span>
-              <small>база: вес × 35 мл</small>
+              <small>цель = вес × 35 мл</small>
             </div>
             <input class="input" id="weightInput" type="number" inputmode="decimal" min="20" max="250" step="0.1" />
           </div>
@@ -1154,79 +776,16 @@
           </div>
         </div>
 
-        <div class="row">
-          <div class="field">
-            <div class="label">
-              <span>Таймер между стаканами</span>
-              <small>защита от «залпом»</small>
-            </div>
-            <input class="input" id="cooldownInput" type="number" inputmode="numeric" min="5" max="180" step="1" />
-          </div>
-
-          <div class="field">
-            <div class="label">
-              <span>Лимит в час (мл)</span>
-              <small>мягкое предупреждение</small>
-            </div>
-            <input class="input" id="perHourInput" type="number" inputmode="numeric" min="300" max="2000" step="50" />
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field">
-          <div class="label">
-            <span>Факторы дня</span>
-            <small id="goalBreakdown">—</small>
-          </div>
-
-          <div class="row">
-            <div class="field">
-              <div class="label"><span>Активность</span><small>+ к цели</small></div>
-              <div class="seg" id="activitySeg" role="group" aria-label="Активность">
-                <button type="button" data-v="low" aria-pressed="false">Низкая</button>
-                <button type="button" data-v="normal" aria-pressed="true">Норм</button>
-                <button type="button" data-v="high" aria-pressed="false">Высокая</button>
-              </div>
-            </div>
-
-            <div class="field">
-              <div class="label"><span>Жара/духота</span><small>+ к цели</small></div>
-              <div class="seg" id="climateSeg" role="group" aria-label="Жара">
-                <button type="button" data-v="cool" aria-pressed="false">Прохладно</button>
-                <button type="button" data-v="normal" aria-pressed="true">Норм</button>
-                <button type="button" data-v="hot" aria-pressed="false">Жарко</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="field">
-              <div class="label"><span>Кофеин (чашки)</span><small>мягко компенсируем</small></div>
-              <input class="input" id="caffeineInput" type="number" inputmode="numeric" min="0" max="10" step="1" />
-            </div>
-
-            <div class="field">
-              <div class="label"><span>Напоминания</span><small>вкладка должна быть открыта</small></div>
-              <div class="seg" id="remindSeg" role="group" aria-label="Напоминания">
-                <button type="button" data-v="on" aria-pressed="true">Вкл</button>
-                <button type="button" data-v="off" aria-pressed="false">Выкл</button>
-                <button type="button" data-v="notify" aria-pressed="false">+ Уведомл.</button>
-              </div>
-            </div>
-          </div>
-
-          <div style="color: rgba(232,251,255,.56); font-size: 12px; line-height: 1.45;">
-            ⚠️ Это не медсовет. При заболеваниях почек/сердца и т.п. ориентируйся на рекомендации врача.
-          </div>
-        </div>
-
         <div class="divider"></div>
 
         <div class="field">
           <div class="label">
             <span>Текущая цель</span>
             <small id="settingsGoal">0 мл/день</small>
+          </div>
+          <div style="color: rgba(232,251,255,.62); font-size: 13px; line-height: 1.45;">
+            Данные сохраняются локально (LocalStorage). При смене дня счётчик «сегодня» сбрасывается,
+            а результат за вчера автоматически попадает в историю.
           </div>
         </div>
 
@@ -1245,9 +804,9 @@
         <div class="sheet__title" id="statsTitle">
           <!-- histogram icon -->
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M6 19V10" stroke="color-mix(in oklab, var(--accent) 80%, transparent)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M6 19V10" stroke="rgba(98,246,255,.85)" stroke-width="2" stroke-linecap="round"/>
             <path d="M12 19V6" stroke="rgba(232,251,255,.78)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M18 19v-8" stroke="color-mix(in oklab, var(--accent) 55%, transparent)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M18 19v-8" stroke="rgba(98,246,255,.55)" stroke-width="2" stroke-linecap="round"/>
             <path d="M5 19h14" stroke="rgba(232,251,255,.48)" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
           Статистика (7 дней)
@@ -1275,7 +834,7 @@
 
         <div class="actions" style="justify-content: space-between;">
           <button class="btn btnline danger" id="resetToday" type="button">Сбросить за сегодня</button>
-          <button class="btn btnline danger" id="resetAll" type="button">Сбросить полностью</button>
+          <button class="btn btnline danger" id="resetAll" type="button">Сбросить статистику полностью</button>
         </div>
       </div>
     </div>
@@ -1285,117 +844,44 @@
     (() => {
       "use strict";
 
-      const STORAGE_KEY = "water_tracker_deep_ocean_v2_plan";
+      const STORAGE_KEY = "water_tracker_deep_ocean_v1";
 
       const $ = (sel, root=document) => root.querySelector(sel);
-      const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
       const els = {
         percent: $("#percent"),
         amount: $("#amount"),
         goalNote: $("#goalNote"),
-
-        nextTime: $("#nextTime"),
-        nextHint: $("#nextHint"),
-        guardValue: $("#guardValue"),
-        guardHint: $("#guardHint"),
+        hintText: $("#hintText"),
 
         plusBtn: $("#plusBtn"),
         minusBtn: $("#minusBtn"),
 
-        wakeBtn: $("#wakeBtn"),
-        wakeText: $("#wakeText"),
-
         settingsBtn: $("#settingsBtn"),
         statsBtn: $("#statsBtn"),
 
-        planModal: $("#planModal"),
-        planClose: $("#planClose"),
-        planCancel: $("#planCancel"),
-        planSave: $("#planSave"),
-        planEstimate: $("#planEstimate"),
-        planWarnings: $("#planWarnings"),
-        intervals: $("#intervals"),
-        addInterval: $("#addInterval"),
-        wakeAtInput: $("#wakeAtInput"),
-        sleepAtInput: $("#sleepAtInput"),
-        wakeAtLabel: $("#wakeAtLabel"),
-        tplBtns: $$(".tpl"),
-
-        remindModal: $("#remindModal"),
-        remindClose: $("#remindClose"),
-        snoozeBtn: $("#snoozeBtn"),
-        drinkNowBtn: $("#drinkNowBtn"),
-        remindWhen: $("#remindWhen"),
-        remindMain: $("#remindMain"),
-        remindSub: $("#remindSub"),
-
         settingsModal: $("#settingsModal"),
+        statsModal: $("#statsModal"),
+
         settingsClose: $("#settingsClose"),
+        statsClose: $("#statsClose"),
         settingsCancel: $("#settingsCancel"),
         settingsSave: $("#settingsSave"),
 
         weightInput: $("#weightInput"),
         glassInput: $("#glassInput"),
-        cooldownInput: $("#cooldownInput"),
-        perHourInput: $("#perHourInput"),
-        caffeineInput: $("#caffeineInput"),
-
-        activitySeg: $("#activitySeg"),
-        climateSeg: $("#climateSeg"),
-        remindSeg: $("#remindSeg"),
-
-        goalBreakdown: $("#goalBreakdown"),
         settingsGoal: $("#settingsGoal"),
 
-        statsModal: $("#statsModal"),
-        statsClose: $("#statsClose"),
         statsList: $("#statsList"),
         statsSummary: $("#statsSummary"),
-        resetToday: $("#resetToday"),
-        resetAll: $("#resetAll"),
 
-        toast: $("#toast"),
-        toastTitle: $("#toastTitle"),
-        toastMsg: $("#toastMsg")
+        resetToday: $("#resetToday"),
+        resetAll: $("#resetAll")
       };
 
       const pad2 = (n) => String(n).padStart(2, "0");
-      const now = () => Date.now();
-      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-
       const toISODateLocal = (d) => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-      const todayISO = () => toISODateLocal(new Date());
 
-      const parseTimeToMin = (hhmm) => {
-        if (!hhmm || typeof hhmm !== "string" || !hhmm.includes(":")) return null;
-        const [h,m] = hhmm.split(":").map(Number);
-        if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
-        return clamp(h,0,23)*60 + clamp(m,0,59);
-      };
-      const minToTime = (mins) => {
-        const m = ((mins % 1440) + 1440) % 1440;
-        return `${pad2(Math.floor(m/60))}:${pad2(m%60)}`;
-      };
-      const tsFromTodayMin = (mins) => {
-        const d = new Date();
-        d.setHours(0,0,0,0);
-        return d.getTime() + mins*60*1000;
-      };
-      const fmtClock = (ts) => {
-        const d = new Date(ts);
-        return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-      };
-      const weekdayShort = (isoDate) => {
-        const [y,m,day] = isoDate.split("-").map(Number);
-        const d = new Date(y, m-1, day);
-        return d.toLocaleDateString("ru-RU", { weekday: "short" }).replace(".", "");
-      };
-      const prettyDate = (isoDate) => {
-        const [y,m,day] = isoDate.split("-").map(Number);
-        const d = new Date(y, m-1, day);
-        return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
-      };
       const addDays = (isoDate, delta) => {
         const [y,m,day] = isoDate.split("-").map(Number);
         const d = new Date(y, m-1, day);
@@ -1403,824 +889,171 @@
         return toISODateLocal(d);
       };
 
-      const haptic = (pattern=10) => { if (navigator.vibrate) navigator.vibrate(pattern); };
+      const weekdayShort = (isoDate) => {
+        const [y,m,day] = isoDate.split("-").map(Number);
+        const d = new Date(y, m-1, day);
+        return d.toLocaleDateString("ru-RU", { weekday: "short" }).replace(".", "");
+      };
 
-      let toastTimer = null;
-      const toast = (title, msg, vib=null) => {
-        els.toastTitle.textContent = title;
-        els.toastMsg.textContent = msg;
-        els.toast.classList.add("show");
-        if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => els.toast.classList.remove("show"), 2600);
-        if (vib) haptic(vib);
+      const prettyDate = (isoDate) => {
+        const [y,m,day] = isoDate.split("-").map(Number);
+        const d = new Date(y, m-1, day);
+        return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
+      };
+
+      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+      const calcGoalMl = (weightKg) => {
+        const w = Number(weightKg);
+        if (!Number.isFinite(w) || w <= 0) return 0;
+        return Math.round(w * 35);
       };
 
       const defaults = () => ({
-        settings: {
-          weightKg: 70,
-          glassMl: 250,
-          cooldownMin: 20,
-          perHourLimitMl: 750,
-          activity: "normal",   // low|normal|high
-          climate: "normal",    // cool|normal|hot
-          caffeineCups: 0,
-          reminders: {
-            enabled: true,
-            snoozeMin: 10,
-            useNotification: false
-          }
-        },
-        day: {
-          date: todayISO(),
-          wakeAtMin: null,
-          sleepAtMin: 23*60 + 30,
-          windows: [],         // [{startMin,endMin}]
-          targets: [],         // [ts...]
-          snoozeUntilTs: null, // timestamp
-          events: []           // [{ts, ml}]
-        },
-        history: [] // last 7: [{date, ml, goalMl, plannedTargets, doneCount}]
+        weightKg: 70,
+        glassMl: 250,
+        todayMl: 0,
+        lastDate: toISODateLocal(new Date()),
+        history: [] // [{date:'YYYY-MM-DD', ml:number, goalMl:number}]
       });
 
       const load = () => {
         try{
           const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) return defaults();
-          const p = JSON.parse(raw);
+          const parsed = JSON.parse(raw);
+
           const d = defaults();
-
-          const s = p.settings || {};
-          const day = p.day || {};
-          const hist = Array.isArray(p.history) ? p.history : [];
-
-          const out = {
-            settings: {
-              weightKg: Number.isFinite(+s.weightKg) ? +s.weightKg : d.settings.weightKg,
-              glassMl: Number.isFinite(+s.glassMl) ? Math.round(+s.glassMl) : d.settings.glassMl,
-              cooldownMin: Number.isFinite(+s.cooldownMin) ? Math.round(+s.cooldownMin) : d.settings.cooldownMin,
-              perHourLimitMl: Number.isFinite(+s.perHourLimitMl) ? Math.round(+s.perHourLimitMl) : d.settings.perHourLimitMl,
-              activity: (["low","normal","high"].includes(s.activity) ? s.activity : d.settings.activity),
-              climate: (["cool","normal","hot"].includes(s.climate) ? s.climate : d.settings.climate),
-              caffeineCups: Number.isFinite(+s.caffeineCups) ? Math.round(+s.caffeineCups) : d.settings.caffeineCups,
-              reminders: {
-                enabled: !!(s.reminders?.enabled ?? d.settings.reminders.enabled),
-                snoozeMin: Number.isFinite(+s.reminders?.snoozeMin) ? Math.round(+s.reminders.snoozeMin) : d.settings.reminders.snoozeMin,
-                useNotification: !!(s.reminders?.useNotification ?? d.settings.reminders.useNotification)
-              }
-            },
-            day: {
-              date: typeof day.date === "string" ? day.date : d.day.date,
-              wakeAtMin: Number.isFinite(+day.wakeAtMin) ? Math.round(+day.wakeAtMin) : null,
-              sleepAtMin: Number.isFinite(+day.sleepAtMin) ? Math.round(+day.sleepAtMin) : d.day.sleepAtMin,
-              windows: Array.isArray(day.windows) ? day.windows.map(x => ({
-                startMin: Number.isFinite(+x.startMin) ? Math.round(+x.startMin) : null,
-                endMin: Number.isFinite(+x.endMin) ? Math.round(+x.endMin) : null
-              })).filter(x => x.startMin!=null && x.endMin!=null) : [],
-              targets: Array.isArray(day.targets) ? day.targets.filter(Number.isFinite) : [],
-              snoozeUntilTs: Number.isFinite(+day.snoozeUntilTs) ? +day.snoozeUntilTs : null,
-              events: Array.isArray(day.events) ? day.events.map(e => ({
-                ts: Number.isFinite(+e.ts) ? +e.ts : null,
-                ml: Number.isFinite(+e.ml) ? Math.round(+e.ml) : null
-              })).filter(e => e.ts!=null && e.ml!=null) : []
-            },
-            history: hist.map(h => ({
-              date: h.date,
-              ml: Math.max(0, Math.round(+h.ml || 0)),
-              goalMl: Math.max(0, Math.round(+h.goalMl || 0)),
-              plannedTargets: Math.max(0, Math.round(+h.plannedTargets || 0)),
-              doneCount: Math.max(0, Math.round(+h.doneCount || 0))
-            })).filter(h => typeof h.date === "string")
+          const safe = {
+            weightKg: Number.isFinite(+parsed.weightKg) ? +parsed.weightKg : d.weightKg,
+            glassMl: Number.isFinite(+parsed.glassMl) ? Math.round(+parsed.glassMl) : d.glassMl,
+            todayMl: Number.isFinite(+parsed.todayMl) ? Math.round(+parsed.todayMl) : d.todayMl,
+            lastDate: typeof parsed.lastDate === "string" ? parsed.lastDate : d.lastDate,
+            history: Array.isArray(parsed.history) ? parsed.history : d.history
           };
 
-          // clamp
-          out.settings.weightKg = clamp(out.settings.weightKg, 20, 250);
-          out.settings.glassMl = clamp(out.settings.glassMl, 50, 2000);
-          out.settings.cooldownMin = clamp(out.settings.cooldownMin, 5, 180);
-          out.settings.perHourLimitMl = clamp(out.settings.perHourLimitMl, 300, 2000);
-          out.settings.caffeineCups = clamp(out.settings.caffeineCups, 0, 10);
+          // sanitize
+          safe.weightKg = clamp(safe.weightKg, 20, 250);
+          safe.glassMl = clamp(safe.glassMl, 50, 2000);
+          safe.todayMl = Math.max(0, safe.todayMl);
 
-          out.day.sleepAtMin = clamp(out.day.sleepAtMin, 0, 24*60-1);
-          out.day.windows = normalizeWindows(out.day.windows);
+          safe.history = safe.history
+            .filter(x => x && typeof x.date === "string")
+            .map(x => ({
+              date: x.date,
+              ml: Math.max(0, Math.round(+x.ml || 0)),
+              goalMl: Math.max(0, Math.round(+x.goalMl || 0))
+            }));
 
-          return out;
-        }catch{
+          return safe;
+        } catch {
           return defaults();
         }
       };
 
-      const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-
-      const baseGoalMl = (weightKg) => Math.round(weightKg * 35);
-
-      const goalModifiers = (settings) => {
-        let mod = 0;
-        // Activity
-        if (settings.activity === "low") mod += 0;
-        if (settings.activity === "normal") mod += 150;
-        if (settings.activity === "high") mod += 350;
-
-        // Climate
-        if (settings.climate === "cool") mod += 0;
-        if (settings.climate === "normal") mod += 100;
-        if (settings.climate === "hot") mod += 300;
-
-        // Caffeine compensation (soft)
-        mod += clamp(settings.caffeineCups,0,10) * 120;
-
-        return mod;
+      const save = () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       };
 
-      const totalGoalMl = (settings) => {
-        const base = baseGoalMl(settings.weightKg);
-        const mod = goalModifiers(settings);
-        return Math.max(0, base + mod);
-      };
-
-      const normalizeWindows = (windows) => {
-        // keep valid, sorted, merged overlaps
-        const arr = (windows || [])
-          .map(w => ({ startMin: Math.round(w.startMin), endMin: Math.round(w.endMin) }))
-          .filter(w => Number.isFinite(w.startMin) && Number.isFinite(w.endMin) && w.endMin > w.startMin)
-          .map(w => ({
-            startMin: clamp(w.startMin, 0, 1440),
-            endMin: clamp(w.endMin, 0, 1440)
-          }))
-          .sort((a,b) => a.startMin - b.startMin);
-
-        const merged = [];
-        for (const w of arr){
-          const last = merged[merged.length-1];
-          if (!last) merged.push(w);
-          else if (w.startMin <= last.endMin) last.endMin = Math.max(last.endMin, w.endMin);
-          else merged.push(w);
-        }
-        return merged;
+      const dedupeHistoryByDate = (arr) => {
+        const map = new Map();
+        for (const item of arr) map.set(item.date, item);
+        return Array.from(map.values()).sort((a,b) => a.date.localeCompare(b.date));
       };
 
       const ensureDayRollover = () => {
-        const t = todayISO();
-        if (state.day.date !== t) {
-          // save yesterday into history
-          const y = state.day.date;
-          const yGoal = totalGoalMl(state.settings);
-          const yMl = state.day.events.reduce((a,e)=>a+e.ml,0);
-          const yPlanned = Array.isArray(state.day.targets) ? state.day.targets.length : 0;
-          const yDone = countDoneTargets(state.day.targets, state.day.events);
+        const today = toISODateLocal(new Date());
+        if (state.lastDate !== today) {
+          // push yesterday (or last known date) into history
+          if (state.lastDate) {
+            const goal = calcGoalMl(state.weightKg);
+            const entry = { date: state.lastDate, ml: state.todayMl, goalMl: goal };
+            state.history = dedupeHistoryByDate([...(state.history || []), entry]);
 
-          state.history = [...(state.history || []), {
-            date: y, ml: yMl, goalMl: yGoal, plannedTargets: yPlanned, doneCount: yDone
-          }];
+            // keep only last 7 days in storage (excluding today)
+            state.history = state.history.slice(-7);
+          }
 
-          // dedupe by date and keep last 7
-          const map = new Map();
-          for (const h of state.history) map.set(h.date, h);
-          state.history = Array.from(map.values()).sort((a,b)=>a.date.localeCompare(b.date)).slice(-7);
-
-          // reset day
-          state.day = defaults().day;
-          state.day.date = t;
+          state.todayMl = 0;
+          state.lastDate = today;
           save();
         }
+      };
+
+      const haptic = (pattern=10) => {
+        if (navigator.vibrate) navigator.vibrate(pattern);
       };
 
       const setProgress = (percentVisual) => {
         document.documentElement.style.setProperty("--p", String(percentVisual));
       };
 
-      const totalTodayMl = () => state.day.events.reduce((a,e)=>a+e.ml,0);
-
-      const lastDrinkTs = () => {
-        const ev = state.day.events;
-        if (!ev.length) return null;
-        return ev[ev.length-1].ts;
-      };
-
-      const mlLastMinutes = (mins) => {
-        const cutoff = now() - mins*60*1000;
-        return state.day.events.filter(e => e.ts >= cutoff).reduce((a,e)=>a+e.ml,0);
-      };
-
-      const countDoneTargets = (targets, events) => {
-        // count how many target times are "covered" by drinks after wake; simple greedy matching:
-        const t = (targets || []).slice().sort((a,b)=>a-b);
-        const e = (events || []).slice().sort((a,b)=>a.ts-b.ts);
-
-        let i=0, j=0, done=0;
-        while(i < t.length && j < e.length){
-          if (e[j].ts >= t[i]) { done++; i++; j++; }
-          else j++;
-        }
-        return done;
-      };
-
-      const planFeasibility = (windows, wakeMin, sleepMin, settings) => {
-        const goal = totalGoalMl(settings);
-        const glasses = settings.glassMl > 0 ? Math.ceil(goal / settings.glassMl) : 0;
-        const cd = settings.cooldownMin;
-
-        const usable = (normalizeWindows(windows) || [])
-          .map(w => {
-            const s = Math.max(w.startMin, wakeMin ?? 0);
-            const e = Math.min(w.endMin, sleepMin ?? 1440);
-            return { startMin: s, endMin: e };
-          })
-          .filter(w => w.endMin > w.startMin);
-
-        const totalMin = usable.reduce((a,w)=>a+(w.endMin-w.startMin),0);
-        const idealSpacing = glasses > 0 ? (totalMin / glasses) : 0;
-        const requiredMinIfCooldown = glasses * cd;
-
-        const feasible = glasses === 0 ? true : (requiredMinIfCooldown <= totalMin);
-
-        return { goal, glasses, cd, totalMin, idealSpacing, requiredMinIfCooldown, feasible, usable };
-      };
-
-      const generateTargets = (windows, wakeMin, sleepMin, settings) => {
-        const { glasses, totalMin, feasible, usable } = planFeasibility(windows, wakeMin, sleepMin, settings);
-
-        if (!usable.length || glasses <= 0 || totalMin <= 0) return { targets: [], feasible, usable, glasses };
-
-        // Distribute glasses uniformly over concatenated available timeline:
-        // offset = (i + 0.5) * totalMin / glasses
-        const targets = [];
-        for (let i=0; i<glasses; i++){
-          let offset = Math.round((i + 0.5) * totalMin / glasses);
-          let acc = 0;
-          for (const w of usable){
-            const len = w.endMin - w.startMin;
-            if (offset <= acc + len){
-              const m = w.startMin + (offset - acc);
-              targets.push(tsFromTodayMin(m));
-              break;
-            }
-            acc += len;
-          }
-        }
-
-        // Enforce cooldown gently by pushing forward within available windows
-        const cdMs = settings.cooldownMin * 60 * 1000;
-        const pushed = [];
-        for (let i=0; i<targets.length; i++){
-          let t = targets[i];
-          if (i>0 && t - pushed[i-1] < cdMs) t = pushed[i-1] + cdMs;
-          pushed.push(t);
-        }
-
-        // Clamp pushed targets into available windows (if pushed out, keep as-is but feasibility will warn)
-        // We keep them, but runtime "next target" will still work; user sees warning if infeasible.
-        return { targets: pushed, feasible, usable, glasses };
-      };
-
-      const nextTargetTs = () => {
-        const t = state.day.targets || [];
-        if (!t.length) return null;
-
-        const done = countDoneTargets(t, state.day.events);
-        const nxt = t[done] ?? null;
-
-        // If snoozed
-        const snooze = state.day.snoozeUntilTs;
-        if (snooze && nxt && snooze > now() && snooze > nxt) return snooze;
-
-        return nxt;
-      };
-
-      const withinQuiet = () => {
-        const sleep = state.day.sleepAtMin ?? (23*60+30);
-        const curMin = new Date().getHours()*60 + new Date().getMinutes();
-        return curMin >= sleep; // after sleep -> quiet
-      };
-
-      const setAlertMode = (on) => {
-        document.body.classList.toggle("alert", !!on);
-      };
-
       const render = () => {
         ensureDayRollover();
 
-        const goal = totalGoalMl(state.settings);
-        const current = totalTodayMl();
-        const pct = goal > 0 ? Math.round((current / goal) * 100) : 0;
-        setProgress(clamp(pct, 0, 100));
+        const goal = calcGoalMl(state.weightKg);
+        const current = state.todayMl;
 
-        els.percent.textContent = `${pct}%`;
+        const rawPercent = goal > 0 ? Math.round((current / goal) * 100) : 0;
+        const shownPercent = Number.isFinite(rawPercent) ? rawPercent : 0;
+        const visualPercent = clamp(shownPercent, 0, 100);
+
+        setProgress(visualPercent);
+
+        els.percent.textContent = `${shownPercent}%`;
         els.amount.textContent = `${current} / ${goal} ml`;
-        els.goalNote.textContent = `Цель: ${goal} ml • Стакан: ${state.settings.glassMl} ml`;
+        els.goalNote.textContent = `Цель: ${goal} ml • Стакан: ${state.glassMl} ml`;
 
-        // Next target UI
-        const nxt = nextTargetTs();
-        if (!state.day.wakeAtMin || !state.day.windows.length){
-          els.nextTime.textContent = "—";
-          els.nextHint.textContent = "Нажми «Я проснулся», добавь окна доступности — и мы поставим тайминг";
-        } else if (!nxt){
-          els.nextTime.textContent = "—";
-          els.nextHint.textContent = "План готов. Пей по кнопке + — напоминания включатся по целям";
-        } else {
-          const deltaMin = Math.round((nxt - now()) / 60000);
-          if (deltaMin > 0){
-            els.nextTime.textContent = fmtClock(nxt);
-            els.nextHint.textContent = `До следующего: ~${deltaMin} мин • В окнах доступности`;
-          } else {
-            els.nextTime.textContent = "СЕЙЧАС";
-            els.nextHint.textContent = "Ты на точке плана — пора выпить стакан";
-          }
-        }
+        // subtle hint dynamics
+        if (current === 0) els.hintText.textContent = "+ добавляет стакан";
+        else if (shownPercent >= 100) els.hintText.textContent = "Цель достигнута. Можно + по желанию";
+        else els.hintText.textContent = "Держи ритм. + / - корректируют";
 
-        // Guardrails UI
-        const cd = state.settings.cooldownMin;
-        const lastTs = lastDrinkTs();
-        if (!lastTs){
-          els.guardValue.textContent = `${cd} мин`;
-          els.guardHint.textContent = `Минимум между стаканами: ${cd} мин`;
-        } else {
-          const left = Math.ceil((lastTs + cd*60*1000 - now()) / 60000);
-          if (left > 0){
-            els.guardValue.textContent = `${left} мин`;
-            els.guardHint.textContent = `Таймер: подожди ${left} мин, чтобы не «залпом»`;
-          } else {
-            els.guardValue.textContent = "ОК";
-            els.guardHint.textContent = `Таймер прошёл • Лимит/час: ${state.settings.perHourLimitMl} ml`;
-          }
-        }
-
-        // Wake button label
-        els.wakeText.textContent = state.day.wakeAtMin ? "План дня" : "Я проснулся";
+        // settings modal values (if open too)
+        els.settingsGoal.textContent = `${goal} мл/день`;
       };
 
       const openModal = (modalEl) => {
         modalEl.classList.add("is-open");
+        // lock "scroll" (even though we don't scroll)
         document.body.style.overflow = "hidden";
       };
-      const closeModal = (modalEl) => modalEl.classList.remove("is-open");
+
+      const closeModal = (modalEl) => {
+        modalEl.classList.remove("is-open");
+        document.body.style.overflow = "hidden";
+      };
+
       const isOpen = (modalEl) => modalEl.classList.contains("is-open");
 
-      const overlayClose = (modalEl, ev) => { if (ev.target === modalEl) closeModal(modalEl); };
-
-      // ===== Intake actions with guardrails =====
-      const addDrink = (ml, reason="manual") => {
-        ensureDayRollover();
-
-        // Guardrail: cooldown
-        const cd = state.settings.cooldownMin;
-        const lastTs = lastDrinkTs();
-        if (lastTs && (now() - lastTs) < cd*60*1000){
-          const left = Math.ceil((lastTs + cd*60*1000 - now()) / 60000);
-          toast("Предупреждение", `Слишком рано: подожди ~${left} мин (таймер между стаканами)`, [10,40,10]);
-          // we still allow (soft) but highlight alert briefly
-          setAlertMode(true);
-          setTimeout(() => setAlertMode(false), 900);
-        }
-
-        // Guardrail: per hour limit
-        const hourMl = mlLastMinutes(60) + ml;
-        if (hourMl > state.settings.perHourLimitMl){
-          toast("Лимит/час", `За 60 мин будет ${hourMl} ml. Лучше растянуть, чтобы избежать перегруза.`, [12,24,12]);
-          setAlertMode(true);
-          setTimeout(() => setAlertMode(false), 1200);
-        }
-
-        state.day.events.push({ ts: now(), ml: Math.max(1, Math.round(ml)) });
-
-        // If we drank, clear alert + snooze
-        state.day.snoozeUntilTs = null;
-        setAlertMode(false);
-        save();
-        render();
+      const onOverlayClickToClose = (modalEl, ev) => {
+        if (ev.target === modalEl) closeModal(modalEl);
       };
 
-      const removeLastDrink = () => {
-        ensureDayRollover();
-        const ev = state.day.events;
-        if (!ev.length){
-          toast("Данные", "Нечего отменять — сегодня ещё нет стаканов");
-          return;
-        }
-        ev.pop();
-        save();
-        render();
-        toast("Отмена", "Последний стакан удалён", 8);
-      };
+      const formatMl = (n) => `${Math.round(n)} ml`;
 
-      els.plusBtn.addEventListener("click", () => addDrink(state.settings.glassMl));
-      els.minusBtn.addEventListener("click", removeLastDrink);
-
-      // ===== Plan modal (wake + windows) =====
-      const makeIntervalRow = (start="07:00", end="08:00") => {
-        const row = document.createElement("div");
-        row.className = "interval";
-        row.innerHTML = `
-          <div class="tinput">
-            <label>старт</label>
-            <input class="input" type="time" value="${start}">
-          </div>
-          <div class="tinput">
-            <label>конец</label>
-            <input class="input" type="time" value="${end}">
-          </div>
-          <button class="del" type="button" aria-label="Удалить окно">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M7 7l10 10" stroke="rgba(232,251,255,.80)" stroke-width="2" stroke-linecap="round"/>
-              <path d="M17 7L7 17" stroke="rgba(232,251,255,.80)" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
-        `;
-        const del = $(".del", row);
-        del.addEventListener("click", () => {
-          row.remove();
-          updatePlanEstimate();
-        });
-
-        const inputs = $$("input", row);
-        inputs.forEach(i => i.addEventListener("input", updatePlanEstimate));
-
-        return row;
-      };
-
-      const collectWindowsFromUI = () => {
-        const rows = $$(".interval", els.intervals);
-        const windows = rows.map(r => {
-          const t = $$("input[type='time']", r).map(i => i.value);
-          const s = parseTimeToMin(t[0]);
-          const e = parseTimeToMin(t[1]);
-          return { startMin: s ?? 0, endMin: e ?? 0 };
-        });
-        return normalizeWindows(windows);
-      };
-
-      const roundTo5 = (mins) => Math.round(mins / 5) * 5;
-
-      const defaultWakeSleepUI = () => {
-        const d = new Date();
-        const cur = d.getHours()*60 + d.getMinutes();
-        const wake = state.day.wakeAtMin ?? roundTo5(cur);
-        const sleep = state.day.sleepAtMin ?? (23*60+30);
-        els.wakeAtInput.value = minToTime(wake);
-        els.sleepAtInput.value = minToTime(sleep);
-        els.wakeAtLabel.textContent = minToTime(wake);
-      };
-
-      const setTemplate = (name) => {
-        els.tplBtns.forEach(b => b.setAttribute("aria-pressed", "false"));
-        const btn = els.tplBtns.find(b => b.dataset.tpl === name);
-        if (btn) btn.setAttribute("aria-pressed", "true");
-
-        const cur = new Date().getHours()*60 + new Date().getMinutes();
-        const w = parseTimeToMin(els.wakeAtInput.value) ?? cur;
-        const wake = roundTo5(w);
-
-        els.intervals.innerHTML = "";
-        if (name === "school"){
-          // до школы + после
-          els.intervals.appendChild(makeIntervalRow(minToTime(Math.max(wake, 7*60)), "08:00"));
-          els.intervals.appendChild(makeIntervalRow("15:00", "23:00"));
-        } else if (name === "work"){
-          els.intervals.appendChild(makeIntervalRow(minToTime(Math.max(wake, 7*60+30)), "09:00"));
-          els.intervals.appendChild(makeIntervalRow("18:00", "23:00"));
-        } else {
-          // free: один большой интервал
-          els.intervals.appendChild(makeIntervalRow(minToTime(wake), "23:00"));
-        }
-        updatePlanEstimate();
-      };
-
-      els.tplBtns.forEach(b => b.addEventListener("click", () => setTemplate(b.dataset.tpl)));
-
-      const updatePlanEstimate = () => {
-        const wakeMin = parseTimeToMin(els.wakeAtInput.value);
-        const sleepMin = parseTimeToMin(els.sleepAtInput.value);
-
-        const windows = collectWindowsFromUI();
-        const est = planFeasibility(windows, wakeMin, sleepMin, state.settings);
-
-        const goal = est.goal;
-        const glasses = est.glasses;
-        const totalMin = est.totalMin;
-        const ideal = est.idealSpacing;
-        const required = est.requiredMinIfCooldown;
-
-        const nice = (x) => (Number.isFinite(x) ? Math.round(x) : 0);
-        const spacingStr = glasses ? `${nice(ideal)} мин/стакан` : "—";
-
-        els.planEstimate.textContent =
-          `Цель: ${goal} ml • Стаканов: ${glasses} • Доступно: ${totalMin} мин • Идеал: ${spacingStr}`;
-
-        let warn = [];
-        if (!windows.length) warn.push("Добавь хотя бы одно окно доступности.");
-        if (wakeMin == null) warn.push("Укажи время подъёма.");
-        if (sleepMin == null) warn.push("Укажи время сна.");
-        if (sleepMin != null && wakeMin != null && sleepMin <= wakeMin) warn.push("Сон должен быть позже подъёма (в пределах суток).");
-
-        if (windows.length && glasses > 0){
-          if (!est.feasible){
-            warn.push(`Плотно: таймер ${est.cd} мин × ${glasses} стаканов = ${required} мин, а доступно ${totalMin} мин. Добавь окна или увеличь объём стакана.`);
-          } else if (ideal < est.cd + 2){
-            warn.push(`Почти впритык: идеально ~${nice(ideal)} мин между стаканами, а таймер ${est.cd} мин. Если начнёшь позже — можно отстать.`);
-          } else {
-            warn.push("Ок: ритм выглядит реалистично. Напоминания будут только внутри окон.");
-          }
-        }
-
-        els.planWarnings.textContent = warn.join(" ");
-      };
-
-      const openPlan = () => {
-        ensureDayRollover();
-
-        defaultWakeSleepUI();
-
-        // preload current windows or create one default
-        els.intervals.innerHTML = "";
-        const existing = state.day.windows?.length ? state.day.windows : null;
-
-        if (existing){
-          for (const w of existing){
-            els.intervals.appendChild(makeIntervalRow(minToTime(w.startMin), minToTime(w.endMin)));
-          }
-        } else {
-          // default suggestion: from wake to 23:00
-          const cur = new Date();
-          const curMin = cur.getHours()*60 + cur.getMinutes();
-          const wake = parseTimeToMin(els.wakeAtInput.value) ?? roundTo5(curMin);
-          els.intervals.appendChild(makeIntervalRow(minToTime(wake), "23:00"));
-        }
-
-        // reflect wake label
-        els.wakeAtLabel.textContent = els.wakeAtInput.value || "—";
-
-        // estimate
-        updatePlanEstimate();
-
-        openModal(els.planModal);
-      };
-
-      const applyPlan = async () => {
-        const wakeMin = parseTimeToMin(els.wakeAtInput.value);
-        const sleepMin = parseTimeToMin(els.sleepAtInput.value);
-        const windows = collectWindowsFromUI();
-
-        if (wakeMin == null || sleepMin == null || sleepMin <= wakeMin || !windows.length){
-          toast("План", "Проверь: подъём/сон и хотя бы одно окно", [10,20,10]);
-          return;
-        }
-
-        state.day.wakeAtMin = wakeMin;
-        state.day.sleepAtMin = sleepMin;
-        state.day.windows = windows;
-
-        // generate targets
-        const g = generateTargets(windows, wakeMin, sleepMin, state.settings);
-        state.day.targets = g.targets;
-
-        // optional: request Notification permission if chosen
-        if (state.settings.reminders.enabled && state.settings.reminders.useNotification){
-          try{
-            if ("Notification" in window && Notification.permission === "default"){
-              const res = await Notification.requestPermission();
-              if (res !== "granted"){
-                state.settings.reminders.useNotification = false;
-                toast("Уведомления", "Разрешение не выдано — оставим напоминания внутри приложения");
-              } else {
-                toast("Уведомления", "Разрешение получено. Работает, пока вкладка открыта.");
-              }
-            }
-          } catch {}
-        }
-
-        state.day.snoozeUntilTs = null;
-        save();
-        closeModal(els.planModal);
-        render();
-
-        toast("План готов", `Окна: ${windows.length} • Точек: ${state.day.targets.length}`, [8,18,8]);
-      };
-
-      els.wakeBtn.addEventListener("click", openPlan);
-      els.planClose.addEventListener("click", () => closeModal(els.planModal));
-      els.planCancel.addEventListener("click", () => closeModal(els.planModal));
-      els.planModal.addEventListener("click", (ev) => overlayClose(els.planModal, ev));
-
-      els.addInterval.addEventListener("click", () => {
-        els.intervals.appendChild(makeIntervalRow("12:00","13:00"));
-        updatePlanEstimate();
-      });
-
-      els.wakeAtInput.addEventListener("input", () => {
-        els.wakeAtLabel.textContent = els.wakeAtInput.value || "—";
-        updatePlanEstimate();
-      });
-      els.sleepAtInput.addEventListener("input", updatePlanEstimate);
-
-      els.planSave.addEventListener("click", applyPlan);
-
-      // ===== Reminder Engine =====
-      const shouldRemindNow = () => {
-        if (!state.settings.reminders.enabled) return false;
-        if (!state.day.targets?.length) return false;
-        if (!state.day.windows?.length) return false;
-        if (withinQuiet()) return false;
-
-        const nxt = nextTargetTs();
-        if (!nxt) return false;
-
-        // if snoozed and not reached snooze
-        const snooze = state.day.snoozeUntilTs;
-        if (snooze && now() < snooze) return false;
-
-        // remind when target is now or in the past
-        return now() >= nxt;
-      };
-
-      const inAppReminder = () => {
-        const nxt = nextTargetTs();
-        const goal = totalGoalMl(state.settings);
-        const current = totalTodayMl();
-
-        const glass = state.settings.glassMl;
-        const done = countDoneTargets(state.day.targets, state.day.events);
-        const total = state.day.targets.length;
-
-        els.remindWhen.textContent = nxt ? `Плановая точка: ${fmtClock(nxt)}` : "По плану";
-        els.remindMain.textContent = `Выпей ${glass} ml`;
-        els.remindSub.textContent = `Прогресс: ${current}/${goal} ml • Точки плана: ${done}/${total}`;
-
-        setAlertMode(true);
-        openModal(els.remindModal);
-
-        // optional Notification (works only while page open)
-        if (state.settings.reminders.useNotification && "Notification" in window && Notification.permission === "granted"){
-          try{
-            new Notification("Water Tracker: пора пить", {
-              body: `Выпей ${glass} мл • ${done}/${total} по плану`,
-              silent: true
-            });
-          } catch {}
-        }
-
-        haptic([12, 40, 12]);
-      };
-
-      const snooze = () => {
-        const min = clamp(state.settings.reminders.snoozeMin, 1, 60);
-        state.day.snoozeUntilTs = now() + min*60*1000;
-        save();
-        closeModal(els.remindModal);
-        setAlertMode(false);
-        toast("Отложено", `Напомню через ${min} мин`, 8);
-      };
-
-      const drinkFromReminder = () => {
-        addDrink(state.settings.glassMl, "reminder");
-        closeModal(els.remindModal);
-        setAlertMode(false);
-        toast("Принято", "Стакан записан. Идём дальше по плану.", [8,18,8]);
-      };
-
-      els.remindClose.addEventListener("click", () => { closeModal(els.remindModal); setAlertMode(false); });
-      els.remindModal.addEventListener("click", (ev) => overlayClose(els.remindModal, ev));
-      els.snoozeBtn.addEventListener("click", snooze);
-      els.drinkNowBtn.addEventListener("click", drinkFromReminder);
-
-      // ===== Settings =====
-      let draft = null;
-
-      const setSeg = (root, value) => {
-        $$("button", root).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === value)));
-      };
-
-      const readSeg = (root, fallback) => {
-        const btn = $$("button", root).find(b => b.getAttribute("aria-pressed") === "true");
-        return btn?.dataset.v || fallback;
-      };
-
-      const updateGoalTexts = (settings) => {
-        const base = baseGoalMl(settings.weightKg);
-        const mod = goalModifiers(settings);
-        const total = base + mod;
-        els.settingsGoal.textContent = `${total} мл/день`;
-        els.goalBreakdown.textContent = `База ${base} + модиф. ${mod} = ${total} мл`;
-      };
-
-      const openSettings = () => {
-        ensureDayRollover();
-        draft = JSON.parse(JSON.stringify(state.settings));
-
-        els.weightInput.value = String(draft.weightKg);
-        els.glassInput.value = String(draft.glassMl);
-        els.cooldownInput.value = String(draft.cooldownMin);
-        els.perHourInput.value = String(draft.perHourLimitMl);
-        els.caffeineInput.value = String(draft.caffeineCups);
-
-        setSeg(els.activitySeg, draft.activity);
-        setSeg(els.climateSeg, draft.climate);
-
-        // remind seg:
-        if (!draft.reminders.enabled) setSeg(els.remindSeg, "off");
-        else if (draft.reminders.useNotification) setSeg(els.remindSeg, "notify");
-        else setSeg(els.remindSeg, "on");
-
-        updateGoalTexts(draft);
-        openModal(els.settingsModal);
-      };
-
-      const closeSettings = () => { draft = null; closeModal(els.settingsModal); };
-
-      const applyDraftFromUI = () => {
-        if (!draft) return;
-
-        const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
-        const g = clamp(Math.round(parseFloat(els.glassInput.value || "0")), 50, 2000);
-        const cd = clamp(Math.round(parseFloat(els.cooldownInput.value || "0")), 5, 180);
-        const ph = clamp(Math.round(parseFloat(els.perHourInput.value || "0")), 300, 2000);
-        const caf = clamp(Math.round(parseFloat(els.caffeineInput.value || "0")), 0, 10);
-
-        draft.weightKg = Number.isFinite(w) ? w : draft.weightKg;
-        draft.glassMl = Number.isFinite(g) ? g : draft.glassMl;
-        draft.cooldownMin = Number.isFinite(cd) ? cd : draft.cooldownMin;
-        draft.perHourLimitMl = Number.isFinite(ph) ? ph : draft.perHourLimitMl;
-        draft.caffeineCups = Number.isFinite(caf) ? caf : draft.caffeineCups;
-
-        draft.activity = readSeg(els.activitySeg, draft.activity);
-        draft.climate = readSeg(els.climateSeg, draft.climate);
-
-        const r = readSeg(els.remindSeg, "on");
-        if (r === "off") { draft.reminders.enabled = false; draft.reminders.useNotification = false; }
-        if (r === "on")  { draft.reminders.enabled = true;  draft.reminders.useNotification = false; }
-        if (r === "notify") { draft.reminders.enabled = true; draft.reminders.useNotification = true; }
-
-        updateGoalTexts(draft);
-      };
-
-      const saveSettings = () => {
-        applyDraftFromUI();
-        if (!draft) return;
-
-        state.settings = draft;
-
-        // if there is a plan already, regenerate targets with new goal/glass/cooldown
-        if (state.day.windows?.length && state.day.wakeAtMin != null){
-          const g = generateTargets(state.day.windows, state.day.wakeAtMin, state.day.sleepAtMin, state.settings);
-          state.day.targets = g.targets;
-        }
-
-        save();
-        render();
-        closeSettings();
-        toast("Сохранено", "Настройки применены", [8,18,8]);
-      };
-
-      // segmented interactions
-      const wireSeg = (root, cb) => {
-        $$("button", root).forEach(b => b.addEventListener("click", () => {
-          $$("button", root).forEach(x => x.setAttribute("aria-pressed","false"));
-          b.setAttribute("aria-pressed","true");
-          cb?.(b.dataset.v);
-          applyDraftFromUI();
-        }));
-      };
-
-      wireSeg(els.activitySeg);
-      wireSeg(els.climateSeg);
-      wireSeg(els.remindSeg);
-
-      [els.weightInput, els.glassInput, els.cooldownInput, els.perHourInput, els.caffeineInput]
-        .forEach(i => i.addEventListener("input", applyDraftFromUI));
-
-      els.settingsBtn.addEventListener("click", openSettings);
-      els.settingsClose.addEventListener("click", closeSettings);
-      els.settingsCancel.addEventListener("click", closeSettings);
-      els.settingsSave.addEventListener("click", saveSettings);
-      els.settingsModal.addEventListener("click", (ev) => overlayClose(els.settingsModal, ev));
-
-      // ===== Stats =====
       const build7Days = () => {
-        ensureDayRollover();
-        const t = todayISO();
+        const today = toISODateLocal(new Date());
+        const goalToday = calcGoalMl(state.weightKg);
+
         const map = new Map((state.history || []).map(x => [x.date, x]));
         const days = [];
 
-        const goalToday = totalGoalMl(state.settings);
-        const plannedToday = state.day.targets?.length || 0;
-        const doneToday = countDoneTargets(state.day.targets, state.day.events);
-
-        for (let i=6; i>=0; i--){
-          const date = addDays(t, -i);
-          if (date === t){
+        for (let i = 6; i >= 0; i--) {
+          const date = addDays(today, -i);
+          if (date === today) {
             days.push({
               date,
-              ml: totalTodayMl(),
+              ml: state.todayMl,
               goalMl: goalToday,
-              plannedTargets: plannedToday,
-              doneCount: doneToday,
               isToday: true
             });
           } else {
-            const h = map.get(date);
+            const entry = map.get(date);
             days.push({
               date,
-              ml: h ? h.ml : 0,
-              goalMl: h ? h.goalMl : goalToday,
-              plannedTargets: h ? h.plannedTargets : 0,
-              doneCount: h ? h.doneCount : 0,
+              ml: entry ? entry.ml : 0,
+              goalMl: entry ? (entry.goalMl || goalToday) : goalToday,
               isToday: false
             });
           }
@@ -2229,19 +1062,20 @@
       };
 
       const renderStats = () => {
+        ensureDayRollover();
+
         const days = build7Days();
         els.statsList.innerHTML = "";
 
-        let total = 0, hits = 0, plannedSum = 0, doneSum = 0;
+        let total = 0;
+        let hits = 0;
 
-        for (const d of days){
-          const pct = d.goalMl > 0 ? Math.round((d.ml / d.goalMl)*100) : 0;
+        for (const d of days) {
+          const pct = d.goalMl > 0 ? Math.round((d.ml / d.goalMl) * 100) : 0;
           const w = clamp(pct, 0, 100);
+
           total += d.ml;
           if (pct >= 100) hits++;
-
-          plannedSum += d.plannedTargets || 0;
-          doneSum += d.doneCount || 0;
 
           const row = document.createElement("div");
           row.className = "statrow";
@@ -2254,85 +1088,165 @@
               <div class="bar" aria-hidden="true"><i style="width:${w}%"></i></div>
               <div class="meta">
                 <span><strong>${d.ml}</strong> ml</span>
-                <span>${d.goalMl} ml • ${pct}%</span>
-              </div>
-              <div class="meta" style="margin-top:6px; font-size:12px;">
-                <span>План: <strong>${d.doneCount || 0}/${d.plannedTargets || 0}</strong></span>
-                <span>${(d.plannedTargets ? Math.round((d.doneCount/d.plannedTargets)*100) : 0)}%</span>
+                <span>${formatMl(d.goalMl)} • ${pct}%</span>
               </div>
             </div>
           `;
           els.statsList.appendChild(row);
         }
 
-        const avg = Math.round(total/7);
-        const planPct = plannedSum ? Math.round((doneSum/plannedSum)*100) : 0;
-        els.statsSummary.textContent = `Итого: ${total} ml • Ср: ${avg} ml/день • Дней 100%: ${hits}/7 • План: ${planPct}%`;
+        const avg = Math.round(total / 7);
+        els.statsSummary.textContent = `Итого: ${total} ml • Среднее: ${avg} ml/день • Дней 100%: ${hits}/7`;
       };
 
-      const openStats = () => { renderStats(); openModal(els.statsModal); };
+      // ===== State =====
+      let state = load();
+      ensureDayRollover();
+      save();
+      render();
+
+      // ===== Main actions =====
+      const addGlass = () => {
+        ensureDayRollover();
+        state.todayMl = Math.max(0, state.todayMl + state.glassMl);
+        save();
+        render();
+        haptic(12);
+      };
+
+      const removeGlass = () => {
+        ensureDayRollover();
+        state.todayMl = Math.max(0, state.todayMl - state.glassMl);
+        save();
+        render();
+        haptic(8);
+      };
+
+      els.plusBtn.addEventListener("click", addGlass);
+      els.minusBtn.addEventListener("click", removeGlass);
+
+      // ===== Settings =====
+      let draftSettings = null;
+
+      const openSettings = () => {
+        ensureDayRollover();
+        draftSettings = { weightKg: state.weightKg, glassMl: state.glassMl };
+        els.weightInput.value = String(draftSettings.weightKg);
+        els.glassInput.value = String(draftSettings.glassMl);
+
+        els.settingsGoal.textContent = `${calcGoalMl(draftSettings.weightKg)} мл/день`;
+
+        openModal(els.settingsModal);
+      };
+
+      const closeSettings = () => {
+        draftSettings = null;
+        closeModal(els.settingsModal);
+      };
+
+      const saveSettings = () => {
+        const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
+        const g = clamp(Math.round(parseFloat(els.glassInput.value || "0")), 50, 2000);
+
+        state.weightKg = Number.isFinite(w) ? w : state.weightKg;
+        state.glassMl  = Number.isFinite(g) ? g : state.glassMl;
+
+        save();
+        render();
+        closeSettings();
+        haptic([8, 18, 8]);
+      };
+
+      els.settingsBtn.addEventListener("click", openSettings);
+      els.settingsClose.addEventListener("click", closeSettings);
+      els.settingsCancel.addEventListener("click", closeSettings);
+      els.settingsSave.addEventListener("click", saveSettings);
+      els.settingsModal.addEventListener("click", (ev) => onOverlayClickToClose(els.settingsModal, ev));
+
+      const updateDraftGoal = () => {
+        const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
+        els.settingsGoal.textContent = `${calcGoalMl(w)} мл/день`;
+      };
+
+      els.weightInput.addEventListener("input", updateDraftGoal);
+
+      // ===== Stats =====
+      const openStats = () => {
+        renderStats();
+        openModal(els.statsModal);
+      };
+
       const closeStats = () => closeModal(els.statsModal);
 
       els.statsBtn.addEventListener("click", openStats);
       els.statsClose.addEventListener("click", closeStats);
-      els.statsModal.addEventListener("click", (ev) => overlayClose(els.statsModal, ev));
+      els.statsModal.addEventListener("click", (ev) => onOverlayClickToClose(els.statsModal, ev));
 
+      // Reset today
       els.resetToday.addEventListener("click", () => {
         ensureDayRollover();
-        const ok = confirm("Сбросить за сегодня? Это удалит стаканы, план останется.");
+        const ok = confirm("Сбросить выпитое за сегодня?");
         if (!ok) return;
-        state.day.events = [];
-        state.day.snoozeUntilTs = null;
-        setAlertMode(false);
+        state.todayMl = 0;
         save();
         render();
         renderStats();
-        toast("Сброс", "Сегодняшние данные очищены", [10,40,10]);
+        haptic([10, 40, 10]);
       });
 
+      // Reset all
       els.resetAll.addEventListener("click", () => {
-        const ok = confirm("Сбросить полностью? Удалит историю, план и настройки.");
+        const ok = confirm("Сбросить всю статистику полностью? Это удалит историю и значения.");
         if (!ok) return;
-        state = defaults();
+        const d = defaults();
+        state = d;
         save();
-        setAlertMode(false);
         render();
         renderStats();
-        toast("Полный сброс", "Данные очищены", [12,30,12,30,12]);
+        haptic([12, 30, 12, 30, 12]);
       });
 
-      // ===== Keyboard =====
+      // ===== Keyboard (Esc) =====
       window.addEventListener("keydown", (ev) => {
-        if (ev.key === "Escape"){
-          [els.remindModal, els.planModal, els.settingsModal, els.statsModal].forEach(m => {
-            if (isOpen(m)) closeModal(m);
-          });
-          setAlertMode(false);
+        if (ev.key === "Escape") {
+          if (isOpen(els.statsModal)) closeStats();
+          if (isOpen(els.settingsModal)) closeSettings();
         }
       });
 
-      // ===== Parallax =====
+      // ===== Parallax / Depth (mouse + deviceorientation) =====
       const setParallax = (nx, ny) => {
-        const px = clamp(nx, -1, 1) * 10;
+        // nx, ny in [-1..1]
+        const px = clamp(nx, -1, 1) * 10;  // px
         const py = clamp(ny, -1, 1) * 10;
         document.documentElement.style.setProperty("--parx", `${px}px`);
         document.documentElement.style.setProperty("--pary", `${py}px`);
         document.documentElement.style.setProperty("--tilt", `${(-nx * 0.6).toFixed(2)}deg`);
       };
+
+      // mouse (desktop)
       window.addEventListener("mousemove", (ev) => {
         const w = window.innerWidth || 1;
         const h = window.innerHeight || 1;
-        setParallax((ev.clientX / w) * 2 - 1, (ev.clientY / h) * 2 - 1);
+        const nx = (ev.clientX / w) * 2 - 1;
+        const ny = (ev.clientY / h) * 2 - 1;
+        setParallax(nx, ny);
       }, { passive: true });
 
+      // device orientation (mobile)
       const attachDeviceOrientation = () => {
         window.addEventListener("deviceorientation", (ev) => {
+          // gamma: left-right [-90..90], beta: front-back [-180..180]
           const gamma = Number.isFinite(ev.gamma) ? ev.gamma : 0;
           const beta  = Number.isFinite(ev.beta)  ? ev.beta  : 0;
-          setParallax(clamp(gamma / 35, -1, 1), clamp(beta / 45, -1, 1));
+
+          const nx = clamp(gamma / 35, -1, 1);
+          const ny = clamp(beta / 45,  -1, 1);
+          setParallax(nx, ny);
         }, { passive: true });
       };
 
+      // iOS needs permission – пробуем запросить по первому “человеческому” действию
       const maybeEnableMotion = async () => {
         try{
           if (typeof DeviceOrientationEvent !== "undefined" &&
@@ -2342,71 +1256,25 @@
           } else {
             attachDeviceOrientation();
           }
-        } catch {}
+        } catch {
+          // silently ignore
+        }
       };
 
+      // trigger permission request on first tap/click (iOS-friendly)
       const once = { once: true, passive: true };
       window.addEventListener("pointerdown", maybeEnableMotion, once);
       window.addEventListener("touchstart", maybeEnableMotion, once);
 
-      // ===== Reminder loop =====
-      const tickReminders = () => {
-        ensureDayRollover();
-
-        // auto-quiet: if reminder modal open but quiet time -> close
-        if (withinQuiet()){
-          if (isOpen(els.remindModal)) closeModal(els.remindModal);
-          setAlertMode(false);
-          return;
-        }
-
-        if (shouldRemindNow()){
-          // avoid reopening every tick
-          if (!isOpen(els.remindModal)){
-            inAppReminder();
-          } else {
-            setAlertMode(true);
-          }
-        } else {
-          // if not reminding, ensure alert mode off (unless user manually forced by warning)
-          if (!isOpen(els.remindModal)) setAlertMode(false);
-        }
-      };
-
-      // ===== Boot =====
-      let state = load();
-      ensureDayRollover();
-      save();
-
-      render();
-
-      // if opened and no plan yet today, gently toast
-      if (!state.day.wakeAtMin || !state.day.windows.length){
-        toast("Режим", "Нажми «Я проснулся», чтобы собрать график и напоминания", null);
-      } else {
-        // keep UI consistent
-        toast("План", "План на сегодня активен. Напоминания работают в окнах.", null);
-      }
-
-      // timers
+      // ===== Midnight safety check (if tab stays open) =====
       setInterval(() => {
-        // rollover safety
-        const before = state.day.date;
+        const before = state.lastDate;
         ensureDayRollover();
-        if (state.day.date !== before){
+        if (state.lastDate !== before) {
           render();
           if (isOpen(els.statsModal)) renderStats();
         }
       }, 30_000);
-
-      setInterval(() => {
-        render();
-        tickReminders();
-      }, 10_000);
-
-      // immediate reminder check
-      setTimeout(tickReminders, 800);
-
     })();
   </script>
 </body>

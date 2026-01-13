@@ -8,80 +8,58 @@
   <meta name="color-scheme" content="dark" />
   <title>Water Tracker • Deep Ocean Cyberpunk</title>
 
-  <!-- Единственная внешняя зависимость -->
+  <!-- Google Font (единственная внешняя зависимость) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      /* Deep Ocean */
       --bg0:#03040a;
       --bg1:#050916;
       --bg2:#07112a;
 
-      /* Cyan neon */
-      --a:#62f6ff;
-      --a2:#1ad7ff;
-      --a3:#00a9ff;
+      --glass: rgba(10, 18, 40, .40);
+      --glass2: rgba(10, 18, 40, .22);
+      --stroke: rgba(120, 245, 255, .18);
+      --stroke2: rgba(120, 245, 255, .10);
 
-      /* Alert red */
-      --r:#ff3b6b;
-      --r2:#ff2a2a;
+      --cyan: #62f6ff;
+      --cyan2:#1ad7ff;
+      --cyan3:#00a9ff;
 
       --txt: rgba(232, 251, 255, .92);
       --muted: rgba(232, 251, 255, .62);
 
-      --glass: rgba(10, 18, 40, .36);
-      --glass2: rgba(10, 18, 40, .22);
-      --stroke: rgba(120, 245, 255, .16);
-
       --shadow: 0 24px 80px rgba(0,0,0,.55);
-      --glow: 0 0 18px rgba(98, 246, 255, .34), 0 0 52px rgba(26, 215, 255, .16);
+      --glow: 0 0 18px rgba(98, 246, 255, .40), 0 0 52px rgba(26, 215, 255, .18);
 
-      --radius: 22px;
-      --radius2: 28px;
+      --r: 22px;
+      --r2: 28px;
 
-      /* live */
-      --parx: 0px;
-      --pary: 0px;
-      --tilt: 0deg;
-
-      /* ring */
-      --p: 0; /* 0..100 */
-
-      /* alert theme (set by body.alert) */
-      --accent: var(--a);
-      --accentGlow: var(--glow);
-      --bannerBg: rgba(10,18,40,.32);
-      --bannerStroke: rgba(120,245,255,.18);
-    }
-
-    body.alert{
-      --accent: var(--r);
-      --accentGlow: 0 0 18px rgba(255,59,107,.30), 0 0 52px rgba(255,42,42,.16);
-      --bannerBg: rgba(40,10,18,.34);
-      --bannerStroke: rgba(255,59,107,.22);
+      --p: 0;              /* 0..100 (уровень для визуализации) */
+      --parx: 0px;         /* параллакс X */
+      --pary: 0px;         /* параллакс Y */
+      --tilt: 0deg;        /* микро-поворот */
     }
 
     *{ box-sizing: border-box; }
     html, body{ height: 100%; }
     body{
-      margin: 0;
+      margin:0;
       font-family: "Rajdhani", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--txt);
-      background:
-        radial-gradient(1200px 900px at 50% 10%, rgba(98,246,255,.08), transparent 65%),
-        radial-gradient(900px 700px at 20% 80%, rgba(26,215,255,.05), transparent 60%),
-        linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));
-      overflow: hidden;
-      overscroll-behavior: none;
+      background: radial-gradient(1200px 900px at 50% 10%, rgba(98,246,255,.08), transparent 65%),
+                  radial-gradient(900px 700px at 20% 80%, rgba(26,215,255,.05), transparent 60%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));
+      overflow:hidden;
+      overscroll-behavior:none;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
       user-select: none;
     }
 
-    /* ===== Live Background ===== */
+    /* ===== Live Background (Deep Ocean Cyberpunk) ===== */
     .bg{
       position: fixed;
       inset: 0;
@@ -90,11 +68,7 @@
       transform: translate3d(var(--parx), var(--pary), 0) rotate(var(--tilt));
       transform-origin: 50% 50%;
       will-change: transform;
-      filter: saturate(1.05);
-      transition: filter 260ms ease;
     }
-    body.alert .bg{ filter: saturate(1.25) contrast(1.05); }
-
     .bg::before,
     .bg::after{
       content:"";
@@ -103,6 +77,8 @@
       filter: blur(10px);
       opacity: .95;
     }
+
+    /* base flow */
     .bg::before{
       background:
         radial-gradient(900px 700px at 30% 20%, rgba(98,246,255,.16), transparent 60%),
@@ -120,6 +96,8 @@
       animation: drift 14s ease-in-out infinite;
       mix-blend-mode: screen;
     }
+
+    /* caustics-ish shimmer */
     .bg::after{
       background:
         repeating-radial-gradient(circle at 20% 30%,
@@ -132,8 +110,8 @@
       opacity: .25;
       animation: shimmer 10s linear infinite;
       transform: translate3d(calc(var(--parx) * -0.25), calc(var(--pary) * -0.25), 0);
-      mix-blend-mode: screen;
     }
+
     @keyframes drift{
       0%   { transform: translate3d(-1.5%, -1.2%, 0) scale(1.02); }
       50%  { transform: translate3d( 1.8%,  1.0%, 0) scale(1.04); }
@@ -144,82 +122,279 @@
       100% { background-position: 420px 260px, -360px -220px, 0 0; }
     }
 
-    /* ===== App Layout (mobile-first) ===== */
+    /* ===== App Layout ===== */
     .app{
       position: relative;
       z-index: 1;
       min-height: 100dvh;
       display: grid;
-      grid-template-rows: auto auto 1fr auto;
-      padding:
-        max(14px, env(safe-area-inset-top))
-        14px
-        max(14px, env(safe-area-inset-bottom));
-      gap: 12px;
-      max-width: 560px;
-      margin: 0 auto;
+      grid-template-rows: auto 1fr auto;
+      padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+      gap: 14px;
     }
 
-    header{
+    .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 10px;
-      padding: 6px 2px 0;
+      padding: 10px 8px;
     }
-
     .brand{
       display:flex;
       align-items:center;
       gap: 10px;
-      min-width: 0;
+      opacity:.95;
     }
-    .mark{
-      width: 36px; height: 36px;
-      border-radius: 14px;
-      border: 1px solid rgba(120,245,255,.18);
+    .brand__mark{
+      width: 34px; height: 34px;
+      border-radius: 12px;
       background:
         radial-gradient(12px 12px at 30% 30%, rgba(98,246,255,.65), rgba(98,246,255,.12) 55%, rgba(0,0,0,0) 70%),
-        linear-gradient(135deg, rgba(98,246,255,.25), rgba(10,18,40,.10));
-      box-shadow: var(--accentGlow);
+        linear-gradient(135deg, rgba(98,246,255,.25), rgba(10,18,40,.1));
+      border: 1px solid var(--stroke);
+      box-shadow: var(--glow);
       position: relative;
       overflow:hidden;
-      flex: 0 0 auto;
     }
-    .mark::after{
+    .brand__mark::after{
       content:"";
       position:absolute;
       inset:-30%;
-      background: conic-gradient(from 180deg, rgba(0,0,0,0), rgba(98,246,255,.18), rgba(0,0,0,0));
-      animation: spin 4.6s linear infinite;
-      opacity:.7;
+      background: conic-gradient(from 180deg,
+        rgba(98,246,255,.0),
+        rgba(98,246,255,.18),
+        rgba(98,246,255,.0));
+      animation: spin 4.8s linear infinite;
+      opacity:.75;
     }
     @keyframes spin{ to{ transform: rotate(360deg); } }
 
-    .brandText{ min-width:0; }
-    .title{
-      font-family:"Orbitron", sans-serif;
-      font-weight: 800;
+    .brand__name{
+      font-family: "Orbitron", sans-serif;
       letter-spacing: .06em;
+      font-weight: 700;
+      font-size: 14px;
+      color: rgba(232, 251, 255, .88);
       text-transform: uppercase;
-      font-size: 13px;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-      color: rgba(232,251,255,.88);
       line-height: 1.1;
     }
-    .subtitle{
-      margin-top: 2px;
+    .brand__sub{
       font-size: 12px;
-      color: rgba(232,251,255,.60);
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
+      color: var(--muted);
+      margin-top: 2px;
+      letter-spacing: .02em;
     }
 
-    .iconBtn{
-      width: 46px; height: 44px;
+    .hint{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(10, 18, 40, .22);
+      border: 1px solid rgba(120, 245, 255, .12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: rgba(232, 251, 255, .70);
+      font-size: 12px;
+      box-shadow: 0 10px 32px rgba(0,0,0,.35);
+    }
+    .hint svg{ opacity:.8; }
+
+    .center{
+      display:grid;
+      place-items:center;
+      padding: 10px 0;
+    }
+
+    /* ===== Gauge (Glass + Water) ===== */
+    .gauge-wrap{
+      width: min(420px, 100%);
+      display:grid;
+      place-items:center;
+      gap: 18px;
+    }
+
+    .gauge{
+      width: min(320px, 84vw);
+      aspect-ratio: 1 / 1;
+      position: relative;
+      border-radius: 999px;
+      filter: drop-shadow(0 18px 60px rgba(0,0,0,.55));
+    }
+
+    .ring{
+      position:absolute;
+      inset: 0;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 56%, rgba(0,0,0,.55) 72%, rgba(0,0,0,0) 78%),
+        conic-gradient(
+          from -90deg,
+          rgba(98,246,255,.95) calc(var(--p) * 1%),
+          rgba(120,245,255,.12) 0
+        );
+      mask: radial-gradient(circle at 50% 50%, transparent 61%, #000 62%);
+      -webkit-mask: radial-gradient(circle at 50% 50%, transparent 61%, #000 62%);
+      box-shadow: var(--glow);
+      opacity: .95;
+      animation: ringPulse 3.6s ease-in-out infinite;
+    }
+    @keyframes ringPulse{
+      0%,100%{ filter: saturate(1.05) brightness(1.0); }
+      50%{ filter: saturate(1.25) brightness(1.08); }
+    }
+
+    .glass{
+      position:absolute;
+      inset: 14px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(10,18,40,.45), rgba(10,18,40,.20));
+      border: 1px solid rgba(120, 245, 255, .16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), inset 0 -10px 30px rgba(0,0,0,.25);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      overflow:hidden;
+    }
+
+    .water{
+      position:absolute;
+      inset: 0;
+      top: calc((100 - var(--p)) * 1%);
+      transition: top 420ms cubic-bezier(.2,.85,.2,1);
+      background:
+        radial-gradient(240px 160px at 30% 20%, rgba(98,246,255,.40), rgba(98,246,255,.12) 55%, rgba(0,0,0,0) 72%),
+        linear-gradient(180deg, rgba(98,246,255,.14), rgba(26,215,255,.08));
+      filter: saturate(1.1);
+    }
+
+    .wave{
+      position:absolute;
+      inset: -30% -20% -30% -20%;
+      opacity: .85;
+      background:
+        radial-gradient(18px 12px at 10% 30%, rgba(98,246,255,.35), rgba(0,0,0,0) 70%),
+        radial-gradient(18px 12px at 55% 60%, rgba(26,215,255,.26), rgba(0,0,0,0) 70%),
+        radial-gradient(18px 12px at 85% 40%, rgba(0,169,255,.22), rgba(0,0,0,0) 70%),
+        repeating-linear-gradient(90deg,
+          rgba(98,246,255,.10) 0 26px,
+          rgba(0,0,0,0) 26px 54px);
+      transform: translate3d(0,0,0);
+      mix-blend-mode: screen;
+      animation: waves 3.8s linear infinite;
+    }
+    .wave.w2{
+      opacity: .55;
+      filter: blur(1.5px);
+      animation-duration: 5.6s;
+      animation-direction: reverse;
+    }
+    @keyframes waves{
+      0%{ transform: translate3d(-4%, 2%, 0) rotate(-1deg); }
+      100%{ transform: translate3d(4%, -2%, 0) rotate(1deg); }
+    }
+
+    .gauge-content{
+      position:absolute;
+      inset: 0;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding: 42px 18px;
+    }
+
+    .percent{
+      font-family:"Orbitron", sans-serif;
+      font-weight: 800;
+      letter-spacing: .04em;
+      font-size: clamp(44px, 10vw, 64px);
+      line-height: 1;
+      text-shadow: 0 0 26px rgba(98,246,255,.28);
+    }
+    .amount{
+      margin-top: 10px;
+      font-size: 15px;
+      color: rgba(232, 251, 255, .74);
+      letter-spacing: .02em;
+    }
+    .goal-note{
+      margin-top: 8px;
+      font-size: 12px;
+      color: rgba(232, 251, 255, .52);
+    }
+
+    /* ===== Controls ===== */
+    .controls{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .btn{
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(10,18,40,.55), rgba(10,18,40,.26));
+      color: var(--txt);
+      border-radius: 999px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.08);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      cursor:pointer;
+      transition: transform 120ms ease, border-color 180ms ease, box-shadow 240ms ease, background 240ms ease;
+      outline: none;
+      -webkit-user-select:none;
+      user-select:none;
+    }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+    .btn:focus-visible{
+      box-shadow: var(--shadow), 0 0 0 2px rgba(98,246,255,.25), var(--glow);
+      border-color: rgba(98,246,255,.35);
+    }
+
+    .btn--big{
+      width: 86px; height: 86px;
+      border-color: rgba(98,246,255,.28);
+      box-shadow: var(--shadow), var(--glow), inset 0 1px 0 rgba(255,255,255,.10);
+      position: relative;
+      overflow:hidden;
+    }
+    .btn--big::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background: conic-gradient(from 0deg,
+        rgba(98,246,255,.00),
+        rgba(98,246,255,.14),
+        rgba(98,246,255,.00),
+        rgba(26,215,255,.10),
+        rgba(98,246,255,.00));
+      animation: spin 5.5s linear infinite;
+      opacity:.95;
+    }
+    .btn--big svg{ position:relative; z-index: 1; filter: drop-shadow(0 0 14px rgba(98,246,255,.35)); }
+
+    .btn--small{
+      width: 56px; height: 56px;
+      border-color: rgba(120,245,255,.18);
+      opacity: .92;
+    }
+    .btn--small:hover{ border-color: rgba(98,246,255,.30); }
+
+    /* ===== Bottom Nav (subtle) ===== */
+    .bottom{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 10px 6px 4px;
+    }
+    .navbtn{
+      width: 52px; height: 44px;
       border-radius: 16px;
       border: 1px solid rgba(120,245,255,.14);
       background: rgba(10,18,40,.18);
@@ -230,444 +405,114 @@
       align-items:center;
       justify-content:center;
       cursor:pointer;
+      transition: transform 120ms ease, border-color 200ms ease, background 200ms ease, box-shadow 240ms ease;
       outline:none;
-      transition: transform 120ms ease, border-color 200ms ease, box-shadow 240ms ease;
     }
-    .iconBtn:active{ transform: translateY(1px); }
-    .iconBtn:focus-visible{
-      border-color: rgba(98,246,255,.28);
-      box-shadow: 0 14px 42px rgba(0,0,0,.35), 0 0 0 2px rgba(98,246,255,.18);
-    }
-
-    /* ===== Reminder banner (no spam) ===== */
-    .banner{
-      border-radius: var(--radius2);
-      border: 1px solid var(--bannerStroke);
-      background: var(--bannerBg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 22px 70px rgba(0,0,0,.55), var(--accentGlow);
-      padding: 12px 12px;
-      display:flex;
-      gap: 10px;
-      align-items:flex-start;
-      transform: translateY(-10px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 220ms ease, transform 240ms cubic-bezier(.2,.85,.2,1);
-    }
-    .banner.show{
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-    .dot{
-      width: 10px; height: 10px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 22px rgba(98,246,255,.25);
-      margin-top: 5px;
-      flex: 0 0 auto;
-    }
-    body.alert .dot{ box-shadow: 0 0 22px rgba(255,59,107,.25); }
-
-    .bannerMain{ flex: 1 1 auto; min-width: 0; }
-    .bannerTitle{
-      font-family:"Orbitron", sans-serif;
-      font-size: 11px;
-      letter-spacing:.06em;
-      text-transform: uppercase;
-      color: rgba(232,251,255,.90);
-      margin-bottom: 2px;
-    }
-    .bannerText{
-      color: rgba(232,251,255,.70);
-      font-size: 13px;
-      line-height: 1.2;
-    }
-    .bannerActions{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content:flex-end;
-    }
-    .chip{
-      border: 1px solid rgba(120,245,255,.16);
-      background: rgba(10,18,40,.18);
-      color: rgba(232,251,255,.86);
-      border-radius: 999px;
-      padding: 10px 12px;
-      font-weight: 800;
-      letter-spacing:.02em;
-      font-size: 13px;
-      cursor:pointer;
-      outline:none;
-      transition: transform 120ms ease, border-color 180ms ease, box-shadow 220ms ease;
-    }
-    .chip:active{ transform: translateY(1px); }
-    .chip.primary{
-      border-color: rgba(98,246,255,.28);
-      box-shadow: 0 0 0 2px rgba(98,246,255,.14), 0 0 28px rgba(98,246,255,.12);
-    }
-    body.alert .chip.primary{
-      border-color: rgba(255,59,107,.32);
-      box-shadow: 0 0 0 2px rgba(255,59,107,.12), 0 0 28px rgba(255,59,107,.12);
+    .navbtn svg{ opacity:.86; }
+    .navbtn:active{ transform: translateY(1px); }
+    .navbtn:focus-visible{
+      border-color: rgba(98,246,255,.30);
+      box-shadow: 0 14px 42px rgba(0,0,0,.35), 0 0 0 2px rgba(98,246,255,.22);
     }
 
-    /* ===== Cards ===== */
-    .card{
-      border-radius: var(--radius2);
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.20);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-    }
-
-    main{ display:grid; gap: 12px; }
-
-    /* ===== Ring / Hero ===== */
-    .hero{
-      padding: 14px 12px;
-      position: relative;
-      overflow:hidden;
-    }
-    .hero::after{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background:
-        radial-gradient(320px 220px at 20% 20%, rgba(98,246,255,.16), transparent 60%),
-        radial-gradient(420px 260px at 80% 60%, rgba(26,215,255,.10), transparent 60%);
-      opacity:.55;
-      pointer-events:none;
-      mix-blend-mode: screen;
-      animation: heroGlow 8s ease-in-out infinite;
-    }
-    @keyframes heroGlow{
-      0%,100%{ transform: translate3d(-1%, -1%, 0); }
-      50%{ transform: translate3d(1%, 1%, 0); }
-    }
-
-    .ringRow{
-      display:grid;
-      grid-template-columns: 1fr;
-      place-items:center;
-      gap: 12px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .ringWrap{
-      width: min(320px, 84vw);
-      aspect-ratio: 1/1;
-      position: relative;
-      display:grid;
-      place-items:center;
-      filter: drop-shadow(0 18px 60px rgba(0,0,0,.55));
-    }
-
-    .ringSvg{
-      width: 100%;
-      height: 100%;
-      transform: rotate(-90deg);
-    }
-    .track{
-      stroke: rgba(120,245,255,.12);
-      stroke-width: 10;
-      fill: none;
-    }
-    .prog{
-      stroke: var(--accent);
-      stroke-linecap: round;
-      stroke-width: 10;
-      fill: none;
-      filter: drop-shadow(0 0 16px rgba(98,246,255,.25));
-      transition: stroke-dashoffset 420ms cubic-bezier(.2,.85,.2,1);
-    }
-    body.alert .prog{
-      filter: drop-shadow(0 0 16px rgba(255,59,107,.22));
-    }
-
-    .centerText{
-      position:absolute;
-      inset: 0;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding: 34px 18px;
-    }
-    .bigPct{
-      font-family:"Orbitron", sans-serif;
-      font-weight: 900;
-      letter-spacing:.04em;
-      font-size: clamp(44px, 12vw, 68px);
-      line-height: 1;
-      text-shadow: 0 0 26px rgba(98,246,255,.20);
-    }
-    body.alert .bigPct{ text-shadow: 0 0 26px rgba(255,59,107,.18); }
-
-    .amount{
-      margin-top: 10px;
-      font-size: 15px;
-      color: rgba(232,251,255,.76);
-      letter-spacing:.02em;
-    }
-    .micro{
-      margin-top: 8px;
-      font-size: 12px;
-      color: rgba(232,251,255,.56);
-      line-height: 1.25;
-    }
-
-    /* ===== Info row ===== */
-    .infoRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    @media (max-width: 360px){
-      .infoRow{ grid-template-columns: 1fr; }
-    }
-
-    .mini{
-      padding: 12px 12px;
-      min-width: 0;
-    }
-    .k{
-      font-family:"Orbitron", sans-serif;
-      font-size: 11px;
-      letter-spacing:.06em;
-      text-transform: uppercase;
-      color: rgba(232,251,255,.64);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-    .v{
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing:.02em;
-      color: rgba(232,251,255,.92);
-      margin-bottom: 4px;
-      line-height: 1.1;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-    .h{
-      font-size: 12px;
-      color: rgba(232,251,255,.58);
-      line-height: 1.25;
-      white-space: nowrap;
-      overflow:hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* ===== Controls ===== */
-    .controls{
-      display:grid;
-      grid-template-columns: 64px 1fr 64px;
-      gap: 10px;
-      align-items:center;
-      margin-top: 2px;
-    }
-
-    .btn{
-      border: 1px solid rgba(120,245,255,.16);
-      background: rgba(10,18,40,.22);
-      color: rgba(232,251,255,.92);
-      border-radius: 18px;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 18px 60px rgba(0,0,0,.42);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      cursor:pointer;
-      outline:none;
-      transition: transform 120ms ease, border-color 180ms ease, box-shadow 220ms ease, opacity 200ms ease;
-      height: 58px;
-    }
-    .btn:active{ transform: translateY(1px); }
-    .btn:focus-visible{
-      border-color: rgba(98,246,255,.28);
-      box-shadow: 0 18px 60px rgba(0,0,0,.42), 0 0 0 2px rgba(98,246,255,.16);
-    }
-
-    .btnRound{
-      height: 72px;
-      border-radius: 24px;
-      border-color: rgba(98,246,255,.26);
-      background: linear-gradient(180deg, rgba(10,18,40,.46), rgba(10,18,40,.18));
-      box-shadow: 0 22px 80px rgba(0,0,0,.52), var(--accentGlow);
-      position: relative;
-      overflow:hidden;
-    }
-    .btnRound::before{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background: conic-gradient(from 0deg, rgba(0,0,0,0), rgba(98,246,255,.16), rgba(0,0,0,0), rgba(26,215,255,.10), rgba(0,0,0,0));
-      animation: spin 6s linear infinite;
-      opacity:.9;
-    }
-    .btnRound svg{ position: relative; z-index: 1; filter: drop-shadow(0 0 16px rgba(98,246,255,.22)); }
-    body.alert .btnRound svg{ filter: drop-shadow(0 0 16px rgba(255,59,107,.18)); }
-
-    .btn[disabled]{
-      opacity: .55;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-
-    .cooldownBadge{
-      position:absolute;
-      right: 10px;
-      top: 10px;
-      z-index: 2;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.22);
-      color: rgba(232,251,255,.86);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing:.02em;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      display:none;
-    }
-    .btnRound.cooling .cooldownBadge{ display:block; }
-
-    /* ===== Bottom nav ===== */
-    nav{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      justify-content:space-between;
-      padding: 4px 2px 0;
-    }
-    .navBtn{
-      flex: 1;
-      height: 48px;
-      border-radius: 18px;
-      border: 1px solid rgba(120,245,255,.12);
-      background: rgba(10,18,40,.16);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 16px 52px rgba(0,0,0,.35);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      cursor:pointer;
-      outline:none;
-      color: rgba(232,251,255,.82);
-      font-weight: 800;
-      letter-spacing:.02em;
-      transition: transform 120ms ease, border-color 180ms ease, box-shadow 220ms ease;
-    }
-    .navBtn:active{ transform: translateY(1px); }
-    .navBtn:focus-visible{ border-color: rgba(98,246,255,.24); box-shadow: 0 16px 52px rgba(0,0,0,.35), 0 0 0 2px rgba(98,246,255,.14); }
-
-    /* ===== Bottom-sheet modals ===== */
+    /* ===== Modals ===== */
     .modal{
       position: fixed;
       inset: 0;
-      z-index: 20;
-      background: rgba(2, 4, 10, .58);
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(2, 4, 10, .55);
       opacity: 0;
       pointer-events: none;
       transition: opacity 220ms ease;
-      display:grid;
-      align-items:end;
-      padding: 10px 10px max(10px, env(safe-area-inset-bottom));
     }
-    .modal.open{
+    .modal.is-open{
       opacity: 1;
       pointer-events: auto;
     }
     .sheet{
-      width: min(560px, 100%);
-      margin: 0 auto;
-      border-radius: 24px;
-      border: 1px solid rgba(120,245,255,.16);
-      background: linear-gradient(180deg, rgba(10,18,40,.62), rgba(10,18,40,.26));
+      width: min(520px, 100%);
+      border-radius: var(--r2);
+      background: linear-gradient(180deg, rgba(10,18,40,.55), rgba(10,18,40,.25));
+      border: 1px solid rgba(120,245,255,.18);
+      box-shadow: 0 30px 120px rgba(0,0,0,.70), var(--glow);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      box-shadow: 0 30px 120px rgba(0,0,0,.70), var(--accentGlow);
-      overflow:hidden;
-      transform: translateY(10px);
+      overflow: hidden;
+      transform: translateY(10px) scale(.985);
       transition: transform 240ms cubic-bezier(.2,.85,.2,1);
     }
-    .modal.open .sheet{ transform: translateY(0); }
+    .modal.is-open .sheet{ transform: translateY(0) scale(1); }
 
-    .sheetHead{
-      padding: 14px 14px 10px;
+    .sheet__head{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap: 10px;
+      padding: 14px 16px;
       border-bottom: 1px solid rgba(120,245,255,.10);
       background: rgba(10,18,40,.20);
     }
-    .sheetTitle{
+    .sheet__title{
       display:flex;
       align-items:center;
       gap: 10px;
       font-family:"Orbitron", sans-serif;
-      font-size: 13px;
-      letter-spacing:.06em;
+      letter-spacing:.05em;
+      font-weight: 700;
+      font-size: 14px;
       text-transform: uppercase;
-      color: rgba(232,251,255,.88);
+      color: rgba(232, 251, 255, .88);
     }
-    .closeBtn{
-      width: 44px; height: 40px;
-      border-radius: 16px;
-      border: 1px solid rgba(120,245,255,.12);
-      background: rgba(10,18,40,.18);
-      cursor:pointer;
+    .close{
+      width: 42px; height: 38px;
+      border-radius: 14px;
+      border: 1px solid rgba(120,245,255,.14);
+      background: rgba(10,18,40,.20);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       display:flex;
       align-items:center;
       justify-content:center;
+      cursor:pointer;
+      transition: transform 120ms ease, border-color 200ms ease;
       outline:none;
-      transition: transform 120ms ease, border-color 180ms ease;
     }
-    .closeBtn:active{ transform: translateY(1px); }
-    .closeBtn:focus-visible{ border-color: rgba(98,246,255,.24); }
+    .close:active{ transform: translateY(1px); }
+    .close:focus-visible{ border-color: rgba(98,246,255,.30); }
 
-    .sheetBody{
-      padding: 14px;
+    .sheet__body{
+      padding: 16px;
       display:grid;
-      gap: 12px;
-      max-height: min(74dvh, 640px);
-      overflow:auto;
-      -webkit-overflow-scrolling: touch;
+      gap: 14px;
     }
 
-    .field{ display:grid; gap: 8px; }
+    .field{
+      display:grid;
+      gap: 8px;
+    }
     .label{
+      color: rgba(232, 251, 255, .78);
+      font-weight: 600;
+      letter-spacing: .02em;
+      font-size: 13px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap: 10px;
-      font-weight: 800;
-      color: rgba(232,251,255,.78);
-      font-size: 13px;
-      letter-spacing:.02em;
     }
-    .label small{ color: rgba(232,251,255,.52); font-weight: 700; }
+    .label small{
+      font-weight: 600;
+      color: rgba(232, 251, 255, .52);
+    }
 
     .input{
       width: 100%;
       border-radius: 16px;
       border: 1px solid rgba(120,245,255,.14);
       background: rgba(10,18,40,.22);
-      color: rgba(232,251,255,.92);
+      color: rgba(232, 251, 255, .92);
       padding: 12px 12px;
       font-size: 16px;
       outline:none;
@@ -675,174 +520,122 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
     }
     .input:focus{
-      border-color: rgba(98,246,255,.26);
-      box-shadow: 0 0 0 2px rgba(98,246,255,.12);
+      border-color: rgba(98,246,255,.30);
+      box-shadow: 0 0 0 2px rgba(98,246,255,.16);
     }
     input[type="number"]{ appearance: textfield; }
     input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button{ -webkit-appearance: none; margin: 0; }
+    input[type="number"]::-webkit-inner-spin-button{
+      -webkit-appearance: none;
+      margin: 0;
+    }
 
-    .grid2{
+    .row{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    @media (max-width: 380px){ .grid2{ grid-template-columns: 1fr; } }
-
-    .note{
-      font-size: 12px;
-      color: rgba(232,251,255,.58);
-      line-height: 1.35;
-      padding: 10px 12px;
-      border-radius: 18px;
-      border: 1px solid rgba(120,245,255,.10);
-      background: rgba(10,18,40,.14);
-    }
-
-    .seg{
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .seg button{
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.18);
-      color: rgba(232,251,255,.84);
-      border-radius: 999px;
-      padding: 10px 12px;
-      font-weight: 900;
-      letter-spacing:.02em;
-      font-size: 13px;
-      cursor:pointer;
-      outline:none;
-      transition: transform 120ms ease, border-color 180ms ease, box-shadow 220ms ease;
-    }
-    .seg button:active{ transform: translateY(1px); }
-    .seg button[aria-pressed="true"]{
-      border-color: rgba(98,246,255,.26);
-      box-shadow: 0 0 0 2px rgba(98,246,255,.12), 0 0 26px rgba(98,246,255,.10);
-    }
-
-    .blocks{
-      display:grid;
-      gap: 10px;
-    }
-    .blockRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 10px;
-      align-items:center;
-      padding: 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(120,245,255,.10);
-      background: rgba(10,18,40,.14);
+      gap: 12px;
     }
     @media (max-width: 420px){
-      .blockRow{ grid-template-columns: 1fr 1fr; }
-      .blockRow .del{ grid-column: 1/-1; justify-self: end; }
+      .row{ grid-template-columns: 1fr; }
     }
-    .miniLabel{
-      font-family:"Orbitron", sans-serif;
-      font-size: 10px;
-      letter-spacing:.06em;
-      text-transform: uppercase;
-      color: rgba(232,251,255,.56);
-      margin-bottom: 6px;
-    }
-    .del{
-      width: 46px; height: 46px;
-      border-radius: 18px;
-      border: 1px solid rgba(120,245,255,.12);
-      background: rgba(10,18,40,.16);
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      outline:none;
-      transition: transform 120ms ease, border-color 180ms ease;
-    }
-    .del:active{ transform: translateY(1px); }
-    .del:focus-visible{ border-color: rgba(98,246,255,.24); }
 
-    .sheetActions{
+    .actions{
       display:flex;
       gap: 10px;
       justify-content:flex-end;
       flex-wrap: wrap;
-      padding: 0 14px 14px;
+      margin-top: 4px;
     }
-    .actionBtn{
-      height: 48px;
-      border-radius: 18px;
-      padding: 0 14px;
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.18);
-      color: rgba(232,251,255,.90);
-      font-weight: 900;
-      letter-spacing:.02em;
-      cursor:pointer;
-      outline:none;
-      transition: transform 120ms ease, border-color 180ms ease, box-shadow 220ms ease;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
+    .btnline{
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      font-size: 14px;
     }
-    .actionBtn:active{ transform: translateY(1px); }
-    .actionBtn.primary{
-      border-color: rgba(98,246,255,.26);
-      box-shadow: 0 0 0 2px rgba(98,246,255,.12), var(--accentGlow);
+    .btnline.primary{
+      border-color: rgba(98,246,255,.30);
+      box-shadow: 0 18px 60px rgba(0,0,0,.45), 0 0 24px rgba(98,246,255,.24);
+    }
+    .btnline.danger{
+      border-color: rgba(98,246,255,.14);
+      opacity: .95;
     }
 
-    /* Stats rows */
-    .statsList{ display:grid; gap: 10px; }
-    .stat{
-      padding: 10px 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(120,245,255,.10);
-      background: rgba(10,18,40,.14);
-      display:grid;
-      gap: 8px;
+    .divider{
+      height: 1px;
+      background: rgba(120,245,255,.10);
+      margin: 4px 0;
     }
-    .statTop{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
+
+    /* ===== Stats list ===== */
+    .stats{
+      display:grid;
       gap: 10px;
     }
-    .statDate{
+    .statrow{
+      display:grid;
+      grid-template-columns: 84px 1fr;
+      gap: 12px;
+      align-items:center;
+      padding: 10px 10px;
+      border-radius: 18px;
+      border: 1px solid rgba(120,245,255,.12);
+      background: rgba(10,18,40,.16);
+    }
+    .date{
       font-family:"Orbitron", sans-serif;
       font-size: 11px;
-      letter-spacing:.06em;
+      letter-spacing: .05em;
+      color: rgba(232, 251, 255, .70);
       text-transform: uppercase;
-      color: rgba(232,251,255,.72);
+      line-height: 1.25;
     }
-    .statVal{
-      font-size: 13px;
-      font-weight: 900;
-      color: rgba(232,251,255,.90);
-      letter-spacing:.02em;
+    .date b{
+      display:block;
+      font-size: 12px;
+      color: rgba(232, 251, 255, .92);
+      margin-top: 2px;
     }
     .bar{
       height: 10px;
       border-radius: 999px;
+      background: rgba(120,245,255,.08);
       border: 1px solid rgba(120,245,255,.10);
-      background: rgba(120,245,255,.06);
       overflow:hidden;
+      position: relative;
     }
     .bar > i{
       display:block;
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, rgba(98,246,255,.85), rgba(0,169,255,.55));
+      box-shadow: 0 0 18px rgba(98,246,255,.25);
       border-radius: 999px;
       transition: width 520ms cubic-bezier(.2,.85,.2,1);
     }
+    .meta{
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      margin-top: 8px;
+      color: rgba(232, 251, 255, .62);
+      font-size: 13px;
+    }
+    .meta strong{
+      color: rgba(232, 251, 255, .88);
+      font-weight: 700;
+    }
 
-    /* Reduce motion */
+    /* subtle footer safe area */
+    .safe{
+      height: max(0px, env(safe-area-inset-bottom));
+    }
+
+    /* reduce motion */
     @media (prefers-reduced-motion: reduce){
-      .bg::before, .bg::after, .mark::after, .btnRound::before{ animation: none !important; }
-      .prog, .banner, .modal, .sheet{ transition: none !important; }
+      .bg::before, .bg::after, .ring, .btn--big::before, .wave{ animation: none !important; }
+      .water, .bar > i, .modal, .sheet{ transition: none !important; }
     }
   </style>
 </head>
@@ -851,217 +644,112 @@
   <div class="bg" aria-hidden="true"></div>
 
   <div class="app">
-    <header>
+    <div class="topbar">
       <div class="brand">
-        <div class="mark" aria-hidden="true"></div>
-        <div class="brandText">
-          <div class="title">Water Tracker</div>
-          <div class="subtitle" id="subline">Понятный режим • без спама</div>
+        <div class="brand__mark" aria-hidden="true"></div>
+        <div>
+          <div class="brand__name">Water Tracker</div>
+          <div class="brand__sub" id="subline">Deep Ocean Cyberpunk</div>
         </div>
       </div>
 
-      <button class="iconBtn" id="openPlan" type="button" aria-label="Режим">
-        <!-- clock icon -->
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="rgba(232,251,255,.72)" stroke-width="1.6"/>
-          <path d="M12 7v6l4 2" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <div class="hint" id="hint">
+        <!-- droplet icon -->
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2C12 2 6 9.2 6 13.8C6 17.8 8.9 21 12 21C15.1 21 18 17.8 18 13.8C18 9.2 12 2 12 2Z"
+                stroke="rgba(98,246,255,.85)" stroke-width="1.6"/>
+          <path d="M9.4 14.1C9.6 16.2 10.9 17.6 12.6 18.1"
+                stroke="rgba(98,246,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
-      </button>
-    </header>
-
-    <div class="banner" id="banner" role="region" aria-live="polite">
-      <div class="dot" aria-hidden="true"></div>
-      <div class="bannerMain">
-        <div class="bannerTitle" id="bannerTitle">Время пить</div>
-        <div class="bannerText" id="bannerText">—</div>
-      </div>
-      <div class="bannerActions">
-        <button class="chip primary" id="bannerDrink" type="button">Я выпил</button>
-        <button class="chip" id="bannerSnooze" type="button">15 мин</button>
-        <button class="chip" id="bannerHide" type="button">Скрыть</button>
+        <span id="hintText">+ добавляет стакан</span>
       </div>
     </div>
 
-    <main>
-      <section class="card hero">
-        <div class="ringRow">
-          <div class="ringWrap" aria-label="Прогресс воды">
-            <svg class="ringSvg" viewBox="0 0 120 120" aria-hidden="true">
-              <circle class="track" cx="60" cy="60" r="46"></circle>
-              <circle class="prog" id="ringProg" cx="60" cy="60" r="46"></circle>
-            </svg>
-
-            <div class="centerText">
-              <div class="bigPct" id="pct">0%</div>
-              <div class="amount" id="amount">0 / 0 ml</div>
-              <div class="micro" id="microLine">Нажми «Режим» и задай сон/занятость — получишь понятный график</div>
+    <div class="center">
+      <div class="gauge-wrap">
+        <div class="gauge" aria-label="Прогресс гидратации">
+          <div class="ring" aria-hidden="true"></div>
+          <div class="glass">
+            <div class="water" id="water" aria-hidden="true">
+              <div class="wave"></div>
+              <div class="wave w2"></div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section class="infoRow">
-        <div class="card mini">
-          <div class="k">
-            <span>Следующий</span>
-            <!-- droplet -->
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 2S6 9.2 6 13.8C6 17.8 8.9 21 12 21s6-3.2 6-7.2C18 9.2 12 2 12 2Z" stroke="var(--accent)" stroke-width="1.6"/>
+          <div class="gauge-content">
+            <div class="percent" id="percent">0%</div>
+            <div class="amount" id="amount">0 / 0 ml</div>
+            <div class="goal-note" id="goalNote">Цель: 0 ml • Стакан: 250 ml</div>
+          </div>
+        </div>
+
+        <div class="controls" aria-label="Управление">
+          <button class="btn btn--small" id="minusBtn" type="button" aria-label="Убавить стакан">
+            <!-- minus icon -->
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6.5 12H17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
             </svg>
-          </div>
-          <div class="v" id="next">—</div>
-          <div class="h" id="nextHint">План на сегодня не задан</div>
-        </div>
+          </button>
 
-        <div class="card mini">
-          <div class="k">
-            <span>Темп</span>
-            <!-- check -->
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M20 7L10 17l-4-4" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="v" id="pace">—</div>
-          <div class="h" id="paceHint">План покажет «сколько точек закрыто»</div>
-        </div>
-      </section>
-
-      <section class="controls" aria-label="Управление">
-        <button class="btn" id="undo" type="button" aria-label="Отменить последний стакан">
-          <!-- undo -->
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M9 7H4v5" stroke="rgba(232,251,255,.88)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M4 12c1.2-4 4.6-7 9-7 5 0 9 4 9 9s-4 9-9 9c-3.6 0-6.7-2-8.2-5"
-                  stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </button>
-
-        <button class="btn btnRound" id="add" type="button" aria-label="Добавить стакан">
-          <div class="cooldownBadge" id="cooldownBadge">—</div>
-          <!-- plus -->
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 6.5V17.5" stroke="rgba(232,251,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
-            <path d="M6.5 12H17.5" stroke="rgba(232,251,255,.92)" stroke-width="2.2" stroke-linecap="round"/>
-          </svg>
-        </button>
-
-        <button class="btn" id="openStats" type="button" aria-label="История">
-          <!-- chart -->
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5.5 18.5V5.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M5.5 18.5H18.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M8.2 15.2l3-3 2.2 2.2 4.2-5" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </section>
-    </main>
-
-    <nav aria-label="Навигация">
-      <button class="navBtn" id="navPlan" type="button">
-        <!-- clock -->
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" stroke="rgba(232,251,255,.60)" stroke-width="1.6"/>
-          <path d="M12 7v6l4 2" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Режим
-      </button>
-      <button class="navBtn" id="navSettings" type="button">
-        <!-- gear -->
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" stroke="rgba(232,251,255,.72)" stroke-width="1.6"/>
-          <path d="M19.2 12a7.2 7.2 0 0 0-.08-1l2-1.44-1.8-3.12-2.36.82a7.2 7.2 0 0 0-1.72-1l-.36-2.48H10.2l-.36 2.48a7.2 7.2 0 0 0-1.72 1l-2.36-.82-1.8 3.12 2 1.44a7.2 7.2 0 0 0 0 2l-2 1.44 1.8 3.12 2.36-.82c.54.4 1.12.74 1.72 1l.36 2.48h3.6l.36-2.48c.6-.26 1.18-.6 1.72-1l2.36.82 1.8-3.12-2-1.44c.05-.33.08-.66.08-1Z"
-                stroke="var(--accent)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Настройки
-      </button>
-    </nav>
-  </div>
-
-  <!-- ===== Plan Modal ===== -->
-  <div class="modal" id="planModal" role="dialog" aria-modal="true">
-    <div class="sheet" role="document">
-      <div class="sheetHead">
-        <div class="sheetTitle">
-          <!-- calendar -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 3v3" stroke="rgba(232,251,255,.70)" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M17 3v3" stroke="rgba(232,251,255,.70)" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M5 6h14" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M6 9h12v11H6z" stroke="rgba(232,251,255,.50)" stroke-width="1.3" fill="none"/>
-          </svg>
-          Режим на сегодня
-        </div>
-        <button class="closeBtn" id="planClose" type="button" aria-label="Закрыть">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 7l10 10" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M17 7L7 17" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="sheetBody">
-        <div class="grid2">
-          <div class="field">
-            <div class="label"><span>Подъём</span><small>первый стакан позже</small></div>
-            <input class="input" id="wakeAt" type="time">
-          </div>
-          <div class="field">
-            <div class="label"><span>Сон</span><small>за 90 мин до сна — стоп</small></div>
-            <input class="input" id="sleepAt" type="time">
-          </div>
-        </div>
-
-        <div class="field">
-          <div class="label"><span>Занятость (когда пить неудобно)</span><small>опционально</small></div>
-
-          <div class="seg" role="group" aria-label="Шаблоны">
-            <button type="button" class="tpl" data-tpl="school" aria-pressed="false">Школа 08–15</button>
-            <button type="button" class="tpl" data-tpl="work" aria-pressed="false">Работа 09–18</button>
-            <button type="button" class="tpl" data-tpl="none" aria-pressed="true">Нет</button>
-          </div>
-
-          <div class="blocks" id="blocks"></div>
-
-          <button class="actionBtn" id="addBlock" type="button" style="justify-content:center;">
-            <!-- plus -->
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <button class="btn btn--big" id="plusBtn" type="button" aria-label="Добавить стакан">
+            <!-- plus icon -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M12 6.5V17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
               <path d="M6.5 12H17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            Добавить промежуток
           </button>
         </div>
-
-        <div class="note" id="planPreview">—</div>
-
-        <div class="note">
-          Напоминания работают корректно и **не спамят**: показывается один баннер для ближайшей «точки».
-          Если пропустил — можно «Скрыть» или «15 мин», и оно не будет появляться каждую секунду.
-        </div>
       </div>
+    </div>
 
-      <div class="sheetActions">
-        <button class="actionBtn" id="planCancel" type="button">Отмена</button>
-        <button class="actionBtn primary" id="planSave" type="button">Сохранить режим</button>
-      </div>
+    <div class="bottom" aria-label="Навигация">
+      <button class="navbtn" id="settingsBtn" type="button" aria-label="Настройки">
+        <!-- gear icon -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
+                stroke="rgba(232,251,255,.88)" stroke-width="1.6"/>
+          <path d="M19.2 12a7.2 7.2 0 0 0-.08-1l2-1.44-1.8-3.12-2.36.82a7.2 7.2 0 0 0-1.72-1l-.36-2.48H10.2l-.36 2.48a7.2 7.2 0 0 0-1.72 1l-2.36-.82-1.8 3.12 2 1.44a7.2 7.2 0 0 0 0 2l-2 1.44 1.8 3.12 2.36-.82c.54.4 1.12.74 1.72 1l.36 2.48h3.6l.36-2.48c.6-.26 1.18-.6 1.72-1l2.36.82 1.8-3.12-2-1.44c.05-.33.08-.66.08-1Z"
+                stroke="rgba(98,246,255,.55)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="safe" aria-hidden="true"></div>
+
+      <button class="navbtn" id="statsBtn" type="button" aria-label="Статистика">
+        <!-- chart icon -->
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5.5 18.5V5.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M5.5 18.5H18.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M8.2 15.2l3-3 2.2 2.2 4.2-5"
+                stroke="rgba(98,246,255,.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.2 15.2h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M11.2 12.2h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M13.4 14.4h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M17.6 9.4h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </button>
     </div>
   </div>
 
-  <!-- ===== Settings Modal ===== -->
-  <div class="modal" id="settingsModal" role="dialog" aria-modal="true">
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
     <div class="sheet" role="document">
-      <div class="sheetHead">
-        <div class="sheetTitle">
-          <!-- sliders -->
+      <div class="sheet__head">
+        <div class="sheet__title" id="settingsTitle">
+          <!-- sliders icon -->
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 7h10" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M4 7h10" stroke="rgba(98,246,255,.85)" stroke-width="1.8" stroke-linecap="round"/>
             <path d="M18 7h2" stroke="rgba(232,251,255,.72)" stroke-width="1.8" stroke-linecap="round"/>
             <path d="M4 17h2" stroke="rgba(232,251,255,.72)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M10 17h10" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M10 17h10" stroke="rgba(98,246,255,.85)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M14 7a2 2 0 1 0 0 .01" stroke="rgba(98,246,255,.40)" stroke-width="1.6" fill="none"/>
+            <path d="M8 17a2 2 0 1 0 0 .01" stroke="rgba(98,246,255,.40)" stroke-width="1.6" fill="none"/>
           </svg>
           Настройки
         </div>
-        <button class="closeBtn" id="settingsClose" type="button" aria-label="Закрыть">
+
+        <button class="close" id="settingsClose" type="button" aria-label="Закрыть настройки">
+          <!-- X icon -->
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M7 7l10 10" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
             <path d="M17 7L7 17" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
@@ -1069,62 +757,62 @@
         </button>
       </div>
 
-      <div class="sheetBody">
-        <div class="grid2">
+      <div class="sheet__body">
+        <div class="row">
           <div class="field">
-            <div class="label"><span>Вес (кг)</span><small>цель = вес × 35 мл</small></div>
-            <input class="input" id="weight" type="number" inputmode="decimal" min="20" max="250" step="0.1">
+            <div class="label">
+              <span>Вес (кг)</span>
+              <small>цель = вес × 35 мл</small>
+            </div>
+            <input class="input" id="weightInput" type="number" inputmode="decimal" min="20" max="250" step="0.1" />
           </div>
+
           <div class="field">
-            <div class="label"><span>Стакан (мл)</span><small>по умолч. 250</small></div>
-            <input class="input" id="glass" type="number" inputmode="numeric" min="50" max="2000" step="10">
+            <div class="label">
+              <span>Объём стакана (мл)</span>
+              <small>по умолчанию 250</small>
+            </div>
+            <input class="input" id="glassInput" type="number" inputmode="numeric" min="50" max="2000" step="10" />
           </div>
         </div>
+
+        <div class="divider"></div>
 
         <div class="field">
-          <div class="label"><span>Защита от «залпом»</span><small>мин. интервал</small></div>
-          <input class="input" id="cooldown" type="number" inputmode="numeric" min="5" max="180" step="1">
-          <div class="note">
-            Если интервал не прошёл — кнопка «+» станет недоступна и покажет таймер.
+          <div class="label">
+            <span>Текущая цель</span>
+            <small id="settingsGoal">0 мл/день</small>
+          </div>
+          <div style="color: rgba(232,251,255,.62); font-size: 13px; line-height: 1.45;">
+            Данные сохраняются локально (LocalStorage). При смене дня счётчик «сегодня» сбрасывается,
+            а результат за вчера автоматически попадает в историю.
           </div>
         </div>
 
-        <div class="field">
-          <div class="label"><span>Напоминания</span><small>вкладка должна быть открыта</small></div>
-          <div class="seg" id="remSeg" role="group" aria-label="Напоминания">
-            <button type="button" data-v="on" aria-pressed="true">Вкл</button>
-            <button type="button" data-v="off" aria-pressed="false">Выкл</button>
-            <button type="button" data-v="notify" aria-pressed="false">+ Уведомл.</button>
-          </div>
-          <div class="note">
-            «+ Уведомл.» попросит разрешение браузера. Это всё равно работает лучше всего, когда приложение открыто.
-          </div>
+        <div class="actions">
+          <button class="btn btnline" id="settingsCancel" type="button">Отмена</button>
+          <button class="btn btnline primary" id="settingsSave" type="button">Сохранить</button>
         </div>
-
-        <div class="note" id="settingsPreview">—</div>
-      </div>
-
-      <div class="sheetActions">
-        <button class="actionBtn" id="settingsCancel" type="button">Отмена</button>
-        <button class="actionBtn primary" id="settingsSave" type="button">Сохранить</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== Stats Modal ===== -->
-  <div class="modal" id="statsModal" role="dialog" aria-modal="true">
+  <!-- Stats Modal -->
+  <div class="modal" id="statsModal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
     <div class="sheet" role="document">
-      <div class="sheetHead">
-        <div class="sheetTitle">
-          <!-- chart -->
+      <div class="sheet__head">
+        <div class="sheet__title" id="statsTitle">
+          <!-- histogram icon -->
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M5.5 18.5V5.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M5.5 18.5H18.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
-            <path d="M8.2 15.2l3-3 2.2 2.2 4.2-5" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 19V10" stroke="rgba(98,246,255,.85)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M12 19V6" stroke="rgba(232,251,255,.78)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M18 19v-8" stroke="rgba(98,246,255,.55)" stroke-width="2" stroke-linecap="round"/>
+            <path d="M5 19h14" stroke="rgba(232,251,255,.48)" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
-          История (7 дней)
+          Статистика (7 дней)
         </div>
-        <button class="closeBtn" id="statsClose" type="button" aria-label="Закрыть">
+
+        <button class="close" id="statsClose" type="button" aria-label="Закрыть статистику">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M7 7l10 10" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
             <path d="M17 7L7 17" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
@@ -1132,13 +820,21 @@
         </button>
       </div>
 
-      <div class="sheetBody">
-        <div class="statsList" id="statsList"></div>
-        <div class="note" id="statsSummary">—</div>
+      <div class="sheet__body">
+        <div class="stats" id="statsList"></div>
 
-        <div class="grid2">
-          <button class="actionBtn" id="resetToday" type="button">Сбросить сегодня</button>
-          <button class="actionBtn" id="resetAll" type="button">Сбросить всё</button>
+        <div class="divider"></div>
+
+        <div class="field">
+          <div class="label">
+            <span>Сводка</span>
+            <small id="statsSummary">—</small>
+          </div>
+        </div>
+
+        <div class="actions" style="justify-content: space-between;">
+          <button class="btn btnline danger" id="resetToday" type="button">Сбросить за сегодня</button>
+          <button class="btn btnline danger" id="resetAll" type="button">Сбросить статистику полностью</button>
         </div>
       </div>
     </div>
@@ -1148,1009 +844,409 @@
     (() => {
       "use strict";
 
-      const KEY = "water_tracker_ocean_v3_simple";
-      const $ = (s, r=document) => r.querySelector(s);
-      const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+      const STORAGE_KEY = "water_tracker_deep_ocean_v1";
+
+      const $ = (sel, root=document) => root.querySelector(sel);
 
       const els = {
-        pct: $("#pct"),
+        percent: $("#percent"),
         amount: $("#amount"),
-        microLine: $("#microLine"),
-        next: $("#next"),
-        nextHint: $("#nextHint"),
-        pace: $("#pace"),
-        paceHint: $("#paceHint"),
-        ring: $("#ringProg"),
+        goalNote: $("#goalNote"),
+        hintText: $("#hintText"),
 
-        add: $("#add"),
-        undo: $("#undo"),
-        cooldownBadge: $("#cooldownBadge"),
+        plusBtn: $("#plusBtn"),
+        minusBtn: $("#minusBtn"),
 
-        banner: $("#banner"),
-        bannerTitle: $("#bannerTitle"),
-        bannerText: $("#bannerText"),
-        bannerDrink: $("#bannerDrink"),
-        bannerSnooze: $("#bannerSnooze"),
-        bannerHide: $("#bannerHide"),
-
-        openPlan: $("#openPlan"),
-        openStats: $("#openStats"),
-        navPlan: $("#navPlan"),
-        navSettings: $("#navSettings"),
-
-        planModal: $("#planModal"),
-        planClose: $("#planClose"),
-        planCancel: $("#planCancel"),
-        planSave: $("#planSave"),
-        wakeAt: $("#wakeAt"),
-        sleepAt: $("#sleepAt"),
-        blocks: $("#blocks"),
-        addBlock: $("#addBlock"),
-        tplBtns: $$(".tpl"),
-        planPreview: $("#planPreview"),
+        settingsBtn: $("#settingsBtn"),
+        statsBtn: $("#statsBtn"),
 
         settingsModal: $("#settingsModal"),
+        statsModal: $("#statsModal"),
+
         settingsClose: $("#settingsClose"),
+        statsClose: $("#statsClose"),
         settingsCancel: $("#settingsCancel"),
         settingsSave: $("#settingsSave"),
-        weight: $("#weight"),
-        glass: $("#glass"),
-        cooldown: $("#cooldown"),
-        remSeg: $("#remSeg"),
-        settingsPreview: $("#settingsPreview"),
 
-        statsModal: $("#statsModal"),
-        statsClose: $("#statsClose"),
+        weightInput: $("#weightInput"),
+        glassInput: $("#glassInput"),
+        settingsGoal: $("#settingsGoal"),
+
         statsList: $("#statsList"),
         statsSummary: $("#statsSummary"),
+
         resetToday: $("#resetToday"),
-        resetAll: $("#resetAll"),
+        resetAll: $("#resetAll")
       };
 
-      const pad2 = (n) => String(n).padStart(2,"0");
-      const clamp = (v,a,b) => Math.min(b, Math.max(a,v));
-      const now = () => Date.now();
+      const pad2 = (n) => String(n).padStart(2, "0");
+      const toISODateLocal = (d) => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
 
-      const toISO = (d) => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-      const todayISO = () => toISO(new Date());
-
-      const parseTime = (hhmm) => {
-        if (!hhmm || !hhmm.includes(":")) return null;
-        const [h,m] = hhmm.split(":").map(Number);
-        if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
-        return clamp(h,0,23)*60 + clamp(m,0,59);
-      };
-      const fmtTime = (min) => `${pad2(Math.floor(min/60))}:${pad2(min%60)}`;
-      const tsFromTodayMin = (mins) => {
-        const d = new Date();
-        d.setHours(0,0,0,0);
-        return d.getTime() + mins*60*1000;
-      };
-      const fmtClock = (ts) => {
-        const d = new Date(ts);
-        return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-      };
-      const addDays = (iso, delta) => {
-        const [y,m,dd] = iso.split("-").map(Number);
-        const d = new Date(y, m-1, dd);
-        d.setDate(d.getDate()+delta);
-        return toISO(d);
-      };
-      const wday = (iso) => {
-        const [y,m,dd] = iso.split("-").map(Number);
-        const d = new Date(y, m-1, dd);
-        return d.toLocaleDateString("ru-RU", { weekday:"short" }).replace(".","");
-      };
-      const dm = (iso) => {
-        const [y,m,dd] = iso.split("-").map(Number);
-        const d = new Date(y, m-1, dd);
-        return d.toLocaleDateString("ru-RU", { day:"2-digit", month:"2-digit" });
+      const addDays = (isoDate, delta) => {
+        const [y,m,day] = isoDate.split("-").map(Number);
+        const d = new Date(y, m-1, day);
+        d.setDate(d.getDate() + delta);
+        return toISODateLocal(d);
       };
 
-      const haptic = (p) => { if (navigator.vibrate) navigator.vibrate(p); };
+      const weekdayShort = (isoDate) => {
+        const [y,m,day] = isoDate.split("-").map(Number);
+        const d = new Date(y, m-1, day);
+        return d.toLocaleDateString("ru-RU", { weekday: "short" }).replace(".", "");
+      };
+
+      const prettyDate = (isoDate) => {
+        const [y,m,day] = isoDate.split("-").map(Number);
+        const d = new Date(y, m-1, day);
+        return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
+      };
+
+      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+      const calcGoalMl = (weightKg) => {
+        const w = Number(weightKg);
+        if (!Number.isFinite(w) || w <= 0) return 0;
+        return Math.round(w * 35);
+      };
 
       const defaults = () => ({
-        settings: {
-          weightKg: 70,
-          glassMl: 250,
-          cooldownMin: 20,
-          reminders: { mode: "on", snoozeMin: 15 } // on | off | notify
-        },
-        plan: {
-          wakeMin: null,
-          sleepMin: 23*60+30,
-          busy: [], // [{startMin,endMin}]
-          wakeBufferMin: 15,
-          sleepBufferMin: 90
-        },
-        day: {
-          date: todayISO(),
-          events: [], // [{ts, ml}]
-          targets: [], // [ts]
-          reminder: { lastIdx: null, lastShownTs: 0, dismissedUntilTs: 0 }
-        },
-        history: [] // [{date, ml, goalMl, planned, done}]
+        weightKg: 70,
+        glassMl: 250,
+        todayMl: 0,
+        lastDate: toISODateLocal(new Date()),
+        history: [] // [{date:'YYYY-MM-DD', ml:number, goalMl:number}]
       });
 
       const load = () => {
         try{
-          const raw = localStorage.getItem(KEY);
+          const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) return defaults();
-          const p = JSON.parse(raw);
+          const parsed = JSON.parse(raw);
+
           const d = defaults();
-
-          const s = p.settings || {};
-          const plan = p.plan || {};
-          const day = p.day || {};
-          const hist = Array.isArray(p.history) ? p.history : [];
-
-          const st = {
-            settings: {
-              weightKg: Number.isFinite(+s.weightKg) ? +s.weightKg : d.settings.weightKg,
-              glassMl: Number.isFinite(+s.glassMl) ? Math.round(+s.glassMl) : d.settings.glassMl,
-              cooldownMin: Number.isFinite(+s.cooldownMin) ? Math.round(+s.cooldownMin) : d.settings.cooldownMin,
-              reminders: {
-                mode: (["on","off","notify"].includes(s.reminders?.mode) ? s.reminders.mode : d.settings.reminders.mode),
-                snoozeMin: Number.isFinite(+s.reminders?.snoozeMin) ? Math.round(+s.reminders.snoozeMin) : d.settings.reminders.snoozeMin
-              }
-            },
-            plan: {
-              wakeMin: Number.isFinite(+plan.wakeMin) ? Math.round(+plan.wakeMin) : null,
-              sleepMin: Number.isFinite(+plan.sleepMin) ? Math.round(+plan.sleepMin) : d.plan.sleepMin,
-              busy: Array.isArray(plan.busy) ? plan.busy.map(b => ({
-                startMin: Number.isFinite(+b.startMin) ? Math.round(+b.startMin) : null,
-                endMin: Number.isFinite(+b.endMin) ? Math.round(+b.endMin) : null
-              })).filter(b => b.startMin!=null && b.endMin!=null && b.endMin>b.startMin) : [],
-              wakeBufferMin: d.plan.wakeBufferMin,
-              sleepBufferMin: d.plan.sleepBufferMin
-            },
-            day: {
-              date: typeof day.date==="string" ? day.date : d.day.date,
-              events: Array.isArray(day.events) ? day.events.map(e => ({
-                ts: Number.isFinite(+e.ts) ? +e.ts : null,
-                ml: Number.isFinite(+e.ml) ? Math.round(+e.ml) : null
-              })).filter(e => e.ts!=null && e.ml!=null) : [],
-              targets: Array.isArray(day.targets) ? day.targets.filter(Number.isFinite) : [],
-              reminder: {
-                lastIdx: Number.isFinite(+day.reminder?.lastIdx) ? +day.reminder.lastIdx : null,
-                lastShownTs: Number.isFinite(+day.reminder?.lastShownTs) ? +day.reminder.lastShownTs : 0,
-                dismissedUntilTs: Number.isFinite(+day.reminder?.dismissedUntilTs) ? +day.reminder.dismissedUntilTs : 0
-              }
-            },
-            history: hist.map(h => ({
-              date: h.date,
-              ml: Math.max(0, Math.round(+h.ml||0)),
-              goalMl: Math.max(0, Math.round(+h.goalMl||0)),
-              planned: Math.max(0, Math.round(+h.planned||0)),
-              done: Math.max(0, Math.round(+h.done||0)),
-            })).filter(h => typeof h.date==="string")
+          const safe = {
+            weightKg: Number.isFinite(+parsed.weightKg) ? +parsed.weightKg : d.weightKg,
+            glassMl: Number.isFinite(+parsed.glassMl) ? Math.round(+parsed.glassMl) : d.glassMl,
+            todayMl: Number.isFinite(+parsed.todayMl) ? Math.round(+parsed.todayMl) : d.todayMl,
+            lastDate: typeof parsed.lastDate === "string" ? parsed.lastDate : d.lastDate,
+            history: Array.isArray(parsed.history) ? parsed.history : d.history
           };
 
-          // clamps
-          st.settings.weightKg = clamp(st.settings.weightKg, 20, 250);
-          st.settings.glassMl = clamp(st.settings.glassMl, 50, 2000);
-          st.settings.cooldownMin = clamp(st.settings.cooldownMin, 5, 180);
-          st.settings.reminders.snoozeMin = clamp(st.settings.reminders.snoozeMin, 5, 60);
+          // sanitize
+          safe.weightKg = clamp(safe.weightKg, 20, 250);
+          safe.glassMl = clamp(safe.glassMl, 50, 2000);
+          safe.todayMl = Math.max(0, safe.todayMl);
 
-          st.plan.sleepMin = clamp(st.plan.sleepMin, 0, 1439);
-          st.plan.busy = normalizeBlocks(st.plan.busy);
+          safe.history = safe.history
+            .filter(x => x && typeof x.date === "string")
+            .map(x => ({
+              date: x.date,
+              ml: Math.max(0, Math.round(+x.ml || 0)),
+              goalMl: Math.max(0, Math.round(+x.goalMl || 0))
+            }));
 
-          return st;
-        }catch{
+          return safe;
+        } catch {
           return defaults();
         }
       };
 
-      const save = () => localStorage.setItem(KEY, JSON.stringify(state));
-
-      const normalizeBlocks = (blocks) => {
-        const arr = (blocks||[])
-          .map(b => ({ startMin: Math.round(b.startMin), endMin: Math.round(b.endMin) }))
-          .filter(b => Number.isFinite(b.startMin) && Number.isFinite(b.endMin) && b.endMin > b.startMin)
-          .map(b => ({ startMin: clamp(b.startMin,0,1440), endMin: clamp(b.endMin,0,1440) }))
-          .sort((a,b)=>a.startMin-b.startMin);
-
-        const merged = [];
-        for (const b of arr){
-          const last = merged[merged.length-1];
-          if (!last) merged.push(b);
-          else if (b.startMin <= last.endMin) last.endMin = Math.max(last.endMin, b.endMin);
-          else merged.push(b);
-        }
-        return merged;
+      const save = () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       };
 
-      const goalMl = () => Math.round(state.settings.weightKg * 35);
-
-      const todayMl = () => state.day.events.reduce((a,e)=>a+e.ml,0);
-
-      const lastDrinkTs = () => state.day.events.length ? state.day.events[state.day.events.length-1].ts : null;
-
-      const withinQuiet = () => {
-        if (state.plan.wakeMin == null) return true;
-        const curMin = new Date().getHours()*60 + new Date().getMinutes();
-        const start = state.plan.wakeMin + state.plan.wakeBufferMin;
-        const end = state.plan.sleepMin - state.plan.sleepBufferMin;
-        return curMin < start || curMin >= end;
+      const dedupeHistoryByDate = (arr) => {
+        const map = new Map();
+        for (const item of arr) map.set(item.date, item);
+        return Array.from(map.values()).sort((a,b) => a.date.localeCompare(b.date));
       };
 
-      const buildAvailabilityWindows = () => {
-        const wake = state.plan.wakeMin;
-        if (wake == null) return [];
+      const ensureDayRollover = () => {
+        const today = toISODateLocal(new Date());
+        if (state.lastDate !== today) {
+          // push yesterday (or last known date) into history
+          if (state.lastDate) {
+            const goal = calcGoalMl(state.weightKg);
+            const entry = { date: state.lastDate, ml: state.todayMl, goalMl: goal };
+            state.history = dedupeHistoryByDate([...(state.history || []), entry]);
 
-        const start = wake + state.plan.wakeBufferMin;
-        const end = state.plan.sleepMin - state.plan.sleepBufferMin;
-
-        if (end <= start) return []; // stop before sleep always
-
-        let windows = [{ startMin: start, endMin: end }];
-
-        // subtract busy blocks
-        const busy = normalizeBlocks(state.plan.busy);
-        for (const b of busy){
-          const next = [];
-          for (const w of windows){
-            if (b.endMin <= w.startMin || b.startMin >= w.endMin){
-              next.push(w);
-              continue;
-            }
-            // overlap
-            if (b.startMin > w.startMin) next.push({ startMin: w.startMin, endMin: b.startMin });
-            if (b.endMin < w.endMin) next.push({ startMin: b.endMin, endMin: w.endMin });
-          }
-          windows = next;
-          if (!windows.length) break;
-        }
-
-        return windows.filter(w => w.endMin > w.startMin);
-      };
-
-      const windowsTotalMinutes = (windows) => windows.reduce((a,w)=>a+(w.endMin-w.startMin),0);
-
-      const maxGlassesPossible = (windows, cooldownMin) => {
-        if (!windows.length) return 0;
-        const cd = Math.max(1, cooldownMin);
-        let count = 0;
-        for (const w of windows){
-          let t = w.startMin;
-          while (t <= w.endMin){
-            count++;
-            t += cd;
-            if (t > w.endMin) break;
-          }
-        }
-        return count;
-      };
-
-      const scheduleTargets = () => {
-        // produce targets for today (timestamps) — always within safe window (wake+buffer .. sleep-buffer)
-        const windows = buildAvailabilityWindows();
-        const cd = state.settings.cooldownMin;
-
-        if (!windows.length){
-          state.day.targets = [];
-          return { windows, planned: 0, required: 0, feasible: false };
-        }
-
-        const g = goalMl();
-        const glass = state.settings.glassMl;
-        const required = glass > 0 ? Math.ceil(g / glass) : 0;
-
-        const maxPossible = maxGlassesPossible(windows, cd);
-        const planned = Math.min(required, maxPossible);
-
-        const totalMin = windowsTotalMinutes(windows);
-        if (planned <= 0 || totalMin <= 0){
-          state.day.targets = [];
-          return { windows, planned: 0, required, feasible: false };
-        }
-
-        // map "offset along concatenated windows" -> minute
-        const toMinuteAtOffset = (off) => {
-          let acc = 0;
-          for (const w of windows){
-            const len = w.endMin - w.startMin;
-            if (off <= acc + len){
-              return w.startMin + (off - acc);
-            }
-            acc += len;
-          }
-          return windows[windows.length-1].endMin;
-        };
-
-        const cdMs = cd*60*1000;
-        const targets = [];
-
-        // helper: find earliest time >= minute that still lies in windows
-        const clampToWindows = (minute) => {
-          for (const w of windows){
-            if (minute < w.startMin) return w.startMin;
-            if (minute >= w.startMin && minute <= w.endMin) return minute;
-          }
-          return null;
-        };
-
-        for (let i=0; i<planned; i++){
-          const off = Math.round((i + 0.5) * totalMin / planned);
-          let m = toMinuteAtOffset(off);
-          // sequential cooldown enforcement + window clamp
-          if (i>0){
-            const prev = targets[i-1];
-            const want = prev + cdMs;
-            const wantMin = Math.ceil((want - tsFromTodayMin(0)) / 60000);
-            if (m < wantMin) m = wantMin;
+            // keep only last 7 days in storage (excluding today)
+            state.history = state.history.slice(-7);
           }
 
-          const m2 = clampToWindows(m);
-          if (m2 == null) break;
-
-          const ts = tsFromTodayMin(m2);
-          // ensure cooldown strict (after clamp)
-          if (i>0 && (ts - targets[i-1]) < cdMs){
-            // try to push further inside windows
-            const pushedMin = Math.ceil(((targets[i-1] + cdMs) - tsFromTodayMin(0)) / 60000);
-            const m3 = clampToWindows(pushedMin);
-            if (m3 == null) break;
-            const ts3 = tsFromTodayMin(m3);
-            if ((ts3 - targets[i-1]) < cdMs) break;
-            targets.push(ts3);
-          } else {
-            targets.push(ts);
-          }
+          state.todayMl = 0;
+          state.lastDate = today;
+          save();
         }
-
-        state.day.targets = targets;
-        return { windows, planned: targets.length, required, feasible: targets.length === required };
       };
 
-      const countDoneTargets = (targets, events) => {
-        const t = (targets||[]).slice().sort((a,b)=>a-b);
-        const e = (events||[]).slice().sort((a,b)=>a.ts-b.ts);
-        let i=0, j=0, done=0;
-        while(i<t.length && j<e.length){
-          if (e[j].ts >= t[i]) { done++; i++; j++; }
-          else j++;
-        }
-        return done;
+      const haptic = (pattern=10) => {
+        if (navigator.vibrate) navigator.vibrate(pattern);
       };
 
-      const nextTarget = () => {
-        if (!state.day.targets?.length) return null;
-        const done = countDoneTargets(state.day.targets, state.day.events);
-        return state.day.targets[done] ?? null;
-      };
-
-      const renderRing = (percent) => {
-        // SVG circle circumference
-        const r = 46;
-        const C = 2 * Math.PI * r;
-        els.ring.style.strokeDasharray = `${C}`;
-        const p = clamp(percent, 0, 100);
-        els.ring.style.strokeDashoffset = `${C * (1 - p/100)}`;
-      };
-
-      const setAlert = (on) => document.body.classList.toggle("alert", !!on);
-
-      const showBanner = (title, text) => {
-        els.bannerTitle.textContent = title;
-        els.bannerText.textContent = text;
-        els.banner.classList.add("show");
-      };
-      const hideBanner = () => {
-        els.banner.classList.remove("show");
-        setAlert(false);
-      };
-
-      const updateCooldownUI = () => {
-        const last = lastDrinkTs();
-        const cdMin = state.settings.cooldownMin;
-        if (!last){
-          els.add.disabled = false;
-          els.add.classList.remove("cooling");
-          return;
-        }
-        const end = last + cdMin*60*1000;
-        const leftMs = end - now();
-        if (leftMs > 0){
-          const leftMin = Math.ceil(leftMs/60000);
-          els.add.disabled = true;
-          els.add.classList.add("cooling");
-          els.cooldownBadge.textContent = `${leftMin} мин`;
-        } else {
-          els.add.disabled = false;
-          els.add.classList.remove("cooling");
-        }
+      const setProgress = (percentVisual) => {
+        document.documentElement.style.setProperty("--p", String(percentVisual));
       };
 
       const render = () => {
         ensureDayRollover();
 
-        // ensure targets exist for today if plan is set
-        if (state.plan.wakeMin != null){
-          scheduleTargets();
-        } else {
-          state.day.targets = [];
-        }
+        const goal = calcGoalMl(state.weightKg);
+        const current = state.todayMl;
 
-        const g = goalMl();
-        const cur = todayMl();
-        const pct = g>0 ? Math.round((cur/g)*100) : 0;
+        const rawPercent = goal > 0 ? Math.round((current / goal) * 100) : 0;
+        const shownPercent = Number.isFinite(rawPercent) ? rawPercent : 0;
+        const visualPercent = clamp(shownPercent, 0, 100);
 
-        els.pct.textContent = `${pct}%`;
-        els.amount.textContent = `${cur} / ${g} ml`;
-        renderRing(pct);
+        setProgress(visualPercent);
 
-        // next + pace
-        const nt = nextTarget();
-        const planned = state.day.targets?.length || 0;
-        const done = countDoneTargets(state.day.targets, state.day.events);
+        els.percent.textContent = `${shownPercent}%`;
+        els.amount.textContent = `${current} / ${goal} ml`;
+        els.goalNote.textContent = `Цель: ${goal} ml • Стакан: ${state.glassMl} ml`;
 
-        if (state.plan.wakeMin == null){
-          els.next.textContent = "—";
-          els.nextHint.textContent = "Сначала задай подъём/сон (режим)";
-          els.pace.textContent = "—";
-          els.paceHint.textContent = "Появится после настройки режима";
-          els.microLine.textContent = "Настрой режим: мы распределим цель по времени и не будем будить перед сном.";
-        } else if (!planned){
-          els.next.textContent = "—";
-          els.nextHint.textContent = "Сегодня нет безопасного окна (слишком близко к сну/подъёму)";
-          els.pace.textContent = "—";
-          els.paceHint.textContent = "Попробуй сдвинуть сон/подъём";
-          els.microLine.textContent = "Мы всегда сохраняем паузу до сна (90 мин). Это важнее «догонять ночью».";
-        } else {
-          const nextText = nt ? (now() >= nt ? "СЕЙЧАС" : fmtClock(nt)) : "Готово";
-          els.next.textContent = nextText;
+        // subtle hint dynamics
+        if (current === 0) els.hintText.textContent = "+ добавляет стакан";
+        else if (shownPercent >= 100) els.hintText.textContent = "Цель достигнута. Можно + по желанию";
+        else els.hintText.textContent = "Держи ритм. + / - корректируют";
 
-          if (!nt) els.nextHint.textContent = "План закрыт на сегодня";
-          else {
-            const delta = Math.round((nt - now())/60000);
-            if (delta > 0) els.nextHint.textContent = `До точки: ~${delta} мин`;
-            else els.nextHint.textContent = "Ты на точке плана — выпей стакан";
+        // settings modal values (if open too)
+        els.settingsGoal.textContent = `${goal} мл/день`;
+      };
+
+      const openModal = (modalEl) => {
+        modalEl.classList.add("is-open");
+        // lock "scroll" (even though we don't scroll)
+        document.body.style.overflow = "hidden";
+      };
+
+      const closeModal = (modalEl) => {
+        modalEl.classList.remove("is-open");
+        document.body.style.overflow = "hidden";
+      };
+
+      const isOpen = (modalEl) => modalEl.classList.contains("is-open");
+
+      const onOverlayClickToClose = (modalEl, ev) => {
+        if (ev.target === modalEl) closeModal(modalEl);
+      };
+
+      const formatMl = (n) => `${Math.round(n)} ml`;
+
+      const build7Days = () => {
+        const today = toISODateLocal(new Date());
+        const goalToday = calcGoalMl(state.weightKg);
+
+        const map = new Map((state.history || []).map(x => [x.date, x]));
+        const days = [];
+
+        for (let i = 6; i >= 0; i--) {
+          const date = addDays(today, -i);
+          if (date === today) {
+            days.push({
+              date,
+              ml: state.todayMl,
+              goalMl: goalToday,
+              isToday: true
+            });
+          } else {
+            const entry = map.get(date);
+            days.push({
+              date,
+              ml: entry ? entry.ml : 0,
+              goalMl: entry ? (entry.goalMl || goalToday) : goalToday,
+              isToday: false
+            });
           }
-
-          els.pace.textContent = `${done}/${planned}`;
-          els.paceHint.textContent = done >= planned ? "Все точки закрыты" : "Закрыто точек по плану";
-          els.microLine.textContent = `План: ${planned} стаканов по ${state.settings.glassMl} ml • Стоп за 90 мин до сна`;
         }
-
-        // reminder banner logic (no spam)
-        tickReminder();
-
-        updateCooldownUI();
-        save();
+        return days;
       };
 
-      const ensureDayRollover = () => {
-        const t = todayISO();
-        if (state.day.date !== t){
-          // push previous day to history
-          const y = state.day.date;
-          const yMl = state.day.events.reduce((a,e)=>a+e.ml,0);
-          const yGoal = goalMl();
-          const yPlanned = state.day.targets?.length || 0;
-          const yDone = countDoneTargets(state.day.targets, state.day.events);
-
-          state.history = [...(state.history||[]), { date: y, ml: yMl, goalMl: yGoal, planned: yPlanned, done: yDone }];
-          // dedupe + keep last 7
-          const map = new Map();
-          for (const h of state.history) map.set(h.date, h);
-          state.history = Array.from(map.values()).sort((a,b)=>a.date.localeCompare(b.date)).slice(-7);
-
-          // reset today
-          state.day = defaults().day;
-          state.day.date = t;
-          hideBanner();
-        }
-      };
-
-      const addDrink = (ml) => {
+      const renderStats = () => {
         ensureDayRollover();
-        state.day.events.push({ ts: now(), ml: Math.max(1, Math.round(ml)) });
 
-        // drinking resolves reminder state
-        state.day.reminder.dismissedUntilTs = 0;
-        state.day.reminder.lastShownTs = 0;
-        state.day.reminder.lastIdx = null;
+        const days = build7Days();
+        els.statsList.innerHTML = "";
 
-        hideBanner();
-        haptic([8,18,8]);
-        render();
+        let total = 0;
+        let hits = 0;
+
+        for (const d of days) {
+          const pct = d.goalMl > 0 ? Math.round((d.ml / d.goalMl) * 100) : 0;
+          const w = clamp(pct, 0, 100);
+
+          total += d.ml;
+          if (pct >= 100) hits++;
+
+          const row = document.createElement("div");
+          row.className = "statrow";
+          row.innerHTML = `
+            <div class="date">
+              ${d.isToday ? "сегодня" : weekdayShort(d.date)}
+              <b>${prettyDate(d.date)}</b>
+            </div>
+            <div>
+              <div class="bar" aria-hidden="true"><i style="width:${w}%"></i></div>
+              <div class="meta">
+                <span><strong>${d.ml}</strong> ml</span>
+                <span>${formatMl(d.goalMl)} • ${pct}%</span>
+              </div>
+            </div>
+          `;
+          els.statsList.appendChild(row);
+        }
+
+        const avg = Math.round(total / 7);
+        els.statsSummary.textContent = `Итого: ${total} ml • Среднее: ${avg} ml/день • Дней 100%: ${hits}/7`;
       };
 
-      const undoDrink = () => {
+      // ===== State =====
+      let state = load();
+      ensureDayRollover();
+      save();
+      render();
+
+      // ===== Main actions =====
+      const addGlass = () => {
         ensureDayRollover();
-        if (!state.day.events.length){
-          haptic(10);
-          showBanner("Система", "Сегодня ещё нет записей — нечего отменять");
-          setTimeout(() => { hideBanner(); }, 1400);
-          return;
-        }
-        state.day.events.pop();
-        haptic(8);
-        render();
-      };
-
-      const dueReminder = () => {
-        if (state.settings.reminders.mode === "off") return { due:false };
-        if (state.plan.wakeMin == null) return { due:false };
-        if (!state.day.targets?.length) return { due:false };
-        if (withinQuiet()) return { due:false };
-
-        const nt = nextTarget();
-        if (!nt) return { due:false };
-
-        // we trigger when it's time or already missed
-        const due = now() >= nt;
-        const done = countDoneTargets(state.day.targets, state.day.events);
-        return { due, idx: done, nt };
-      };
-
-      const tickReminder = () => {
-        const r = dueReminder();
-        if (!r.due){
-          // if banner is only reminder banner, hide it
-          if (els.banner.classList.contains("show") && state.plan.wakeMin != null){
-            // keep banner if it was an info message? we treat as reminder only here
-            hideBanner();
-          }
-          return;
-        }
-
-        // no spam rules:
-        // - if dismissedUntilTs in future -> no banner
-        // - if already shown for this idx recently -> no re-show
-        const rem = state.day.reminder;
-        if (rem.dismissedUntilTs && now() < rem.dismissedUntilTs) return;
-
-        const MIN_COOLDOWN = 10 * 60 * 1000; // 10 min between re-pops if ignored
-        const alreadyThisIdx = (rem.lastIdx === r.idx);
-        const soon = (now() - (rem.lastShownTs||0)) < MIN_COOLDOWN;
-
-        if (alreadyThisIdx && soon && els.banner.classList.contains("show")) return;
-        if (alreadyThisIdx && soon && !els.banner.classList.contains("show")) return;
-
-        // Show reminder once
-        rem.lastIdx = r.idx;
-        rem.lastShownTs = now();
-
-        const planned = state.day.targets.length;
-        const glass = state.settings.glassMl;
-        const msg = `Выпей ${glass} ml • Точка ${Math.min(r.idx+1, planned)}/${planned} • План: ${fmtClock(r.nt)}`;
-
-        showBanner("Время пить", msg);
-        setAlert(true);
-
-        // Optional notification (still not spammy: only when banner shows)
-        if (state.settings.reminders.mode === "notify" && "Notification" in window && Notification.permission === "granted"){
-          try{
-            new Notification("Water Tracker", { body: `Пора пить: ${glass} мл`, silent: true });
-          } catch {}
-        }
-      };
-
-      // ===== Modals =====
-      const openModal = (m) => { m.classList.add("open"); document.body.style.overflow="hidden"; };
-      const closeModal = (m) => { m.classList.remove("open"); document.body.style.overflow="hidden"; };
-      const overlayClose = (m, ev) => { if (ev.target === m) closeModal(m); };
-
-      // Plan UI helpers
-      const makeBlockRow = (start="08:00", end="15:00") => {
-        const row = document.createElement("div");
-        row.className = "blockRow";
-        row.innerHTML = `
-          <div>
-            <div class="miniLabel">старт</div>
-            <input class="input" type="time" value="${start}">
-          </div>
-          <div>
-            <div class="miniLabel">конец</div>
-            <input class="input" type="time" value="${end}">
-          </div>
-          <button class="del" type="button" aria-label="Удалить">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M7 7l10 10" stroke="rgba(232,251,255,.80)" stroke-width="2" stroke-linecap="round"/>
-              <path d="M17 7L7 17" stroke="rgba(232,251,255,.80)" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
-        `;
-        const del = $(".del", row);
-        del.addEventListener("click", () => { row.remove(); updatePlanPreview(); });
-
-        $$("input", row).forEach(inp => inp.addEventListener("input", updatePlanPreview));
-        return row;
-      };
-
-      const collectBlocksUI = () => {
-        const rows = $$(".blockRow", els.blocks);
-        const blocks = rows.map(r => {
-          const [s,e] = $$("input[type='time']", r).map(i => parseTime(i.value) ?? 0);
-          return { startMin: s, endMin: e };
-        });
-        return normalizeBlocks(blocks);
-      };
-
-      const setTplPressed = (name) => {
-        els.tplBtns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tpl === name)));
-      };
-
-      const applyTemplate = (tpl) => {
-        setTplPressed(tpl);
-        els.blocks.innerHTML = "";
-        if (tpl === "school") els.blocks.appendChild(makeBlockRow("08:00","15:00"));
-        if (tpl === "work") els.blocks.appendChild(makeBlockRow("09:00","18:00"));
-        updatePlanPreview();
-      };
-
-      const defaultWakeSleep = () => {
-        const cur = new Date();
-        const curMin = cur.getHours()*60 + cur.getMinutes();
-        const w = (state.plan.wakeMin ?? Math.round(curMin/5)*5);
-        const s = (state.plan.sleepMin ?? (23*60+30));
-        els.wakeAt.value = fmtTime(clamp(w,0,1439));
-        els.sleepAt.value = fmtTime(clamp(s,0,1439));
-      };
-
-      const updatePlanPreview = () => {
-        // preview uses "draft" values from UI
-        const wake = parseTime(els.wakeAt.value);
-        const sleep = parseTime(els.sleepAt.value);
-
-        const blocks = collectBlocksUI();
-
-        if (wake == null || sleep == null){
-          els.planPreview.textContent = "Укажи подъём и сон.";
-          return;
-        }
-        if (sleep <= wake){
-          els.planPreview.textContent = "Сон должен быть позже подъёма (в пределах суток).";
-          return;
-        }
-
-        // draft plan clone
-        const draftPlan = {
-          wakeMin: wake,
-          sleepMin: sleep,
-          busy: blocks,
-          wakeBufferMin: state.plan.wakeBufferMin,
-          sleepBufferMin: state.plan.sleepBufferMin
-        };
-
-        // compute windows
-        const start = draftPlan.wakeMin + draftPlan.wakeBufferMin;
-        const end = draftPlan.sleepMin - draftPlan.sleepBufferMin;
-        if (end <= start){
-          els.planPreview.textContent =
-            `Безопасного окна нет: мы всегда оставляем паузу 90 мин до сна и 15 мин после подъёма. Сдвинь сон/подъём.`;
-          return;
-        }
-
-        // windows minus blocks
-        let windows = [{ startMin: start, endMin: end }];
-        const busy = normalizeBlocks(draftPlan.busy);
-        for (const b of busy){
-          const next = [];
-          for (const w of windows){
-            if (b.endMin <= w.startMin || b.startMin >= w.endMin){ next.push(w); continue; }
-            if (b.startMin > w.startMin) next.push({ startMin: w.startMin, endMin: b.startMin });
-            if (b.endMin < w.endMin) next.push({ startMin: b.endMin, endMin: w.endMin });
-          }
-          windows = next;
-        }
-        windows = windows.filter(w => w.endMin>w.startMin);
-
-        const totalMin = windowsTotalMinutes(windows);
-        const g = goalMl();
-        const glass = state.settings.glassMl;
-        const required = glass > 0 ? Math.ceil(g/glass) : 0;
-        const maxPossible = maxGlassesPossible(windows, state.settings.cooldownMin);
-        const planned = Math.min(required, maxPossible);
-
-        const niceH = (m) => {
-          const h = Math.floor(m/60);
-          const mm = m%60;
-          return h ? `${h}ч ${mm}м` : `${mm}м`;
-        };
-
-        let msg = `Окно питья: ${fmtTime(start)}–${fmtTime(end)} (без ночи) • Доступно: ${niceH(totalMin)}.\n`;
-        msg += `Цель: ${g} ml = ~${required} стаканов по ${glass} ml.\n`;
-        msg += `По этому графику поместится: ${planned}/${required} стаканов (таймер ${state.settings.cooldownMin} мин).`;
-
-        if (planned < required){
-          msg += `\nСовет: увеличь стакан или добавь время (раньше подъём/позже сон) — но мы НЕ ставим точки близко ко сну.`;
-        } else {
-          const spacing = planned ? Math.round(totalMin / planned) : 0;
-          msg += `\nИнтервал получится примерно: ~${spacing} мин.`;
-        }
-
-        els.planPreview.textContent = msg;
-      };
-
-      // Settings preview
-      const updateSettingsPreview = () => {
-        const g = goalMl();
-        els.settingsPreview.textContent = `Твоя дневная цель по формуле: ${g} ml (вес × 35).`;
-      };
-
-      const setRemModeUI = (mode) => {
-        $$("button", els.remSeg).forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === mode)));
-      };
-      const getRemModeUI = () => {
-        const b = $$("button", els.remSeg).find(x => x.getAttribute("aria-pressed")==="true");
-        return b?.dataset.v || "on";
-      };
-
-      // ===== Events =====
-      els.add.addEventListener("click", () => addDrink(state.settings.glassMl));
-      els.undo.addEventListener("click", undoDrink);
-
-      els.openStats.addEventListener("click", () => openStats());
-      els.openPlan.addEventListener("click", () => openPlan());
-      els.navPlan.addEventListener("click", () => openPlan());
-      els.navSettings.addEventListener("click", () => openSettings());
-
-      // banner actions
-      els.bannerDrink.addEventListener("click", () => addDrink(state.settings.glassMl));
-      els.bannerSnooze.addEventListener("click", () => {
-        const ms = clamp(state.settings.reminders.snoozeMin,5,60) * 60 * 1000;
-        state.day.reminder.dismissedUntilTs = now() + ms;
-        hideBanner();
-        save();
-        haptic(8);
-      });
-      els.bannerHide.addEventListener("click", () => {
-        // hide for 10 minutes (anti-spam)
-        state.day.reminder.dismissedUntilTs = now() + 10*60*1000;
-        hideBanner();
-        save();
-        haptic(8);
-      });
-
-      // plan modal
-      const openPlan = () => {
-        defaultWakeSleep();
-        // load blocks
-        els.blocks.innerHTML = "";
-        const b = normalizeBlocks(state.plan.busy);
-        if (b.length){
-          for (const x of b){
-            els.blocks.appendChild(makeBlockRow(fmtTime(x.startMin), fmtTime(x.endMin)));
-          }
-          setTplPressed("none");
-        } else {
-          setTplPressed("none");
-        }
-        updatePlanPreview();
-        openModal(els.planModal);
-      };
-      const closePlan = () => closeModal(els.planModal);
-
-      els.planClose.addEventListener("click", closePlan);
-      els.planCancel.addEventListener("click", closePlan);
-      els.planModal.addEventListener("click", (ev) => overlayClose(els.planModal, ev));
-
-      els.addBlock.addEventListener("click", () => {
-        els.blocks.appendChild(makeBlockRow("12:00","13:00"));
-        setTplPressed("none");
-        updatePlanPreview();
-      });
-
-      els.tplBtns.forEach(b => b.addEventListener("click", () => {
-        const tpl = b.dataset.tpl;
-        if (tpl === "none"){
-          setTplPressed("none");
-          els.blocks.innerHTML = "";
-          updatePlanPreview();
-          return;
-        }
-        applyTemplate(tpl);
-      }));
-
-      els.wakeAt.addEventListener("input", updatePlanPreview);
-      els.sleepAt.addEventListener("input", updatePlanPreview);
-
-      els.planSave.addEventListener("click", async () => {
-        const wake = parseTime(els.wakeAt.value);
-        const sleep = parseTime(els.sleepAt.value);
-        if (wake == null || sleep == null || sleep <= wake){
-          haptic([10,20,10]);
-          showBanner("Режим", "Проверь подъём/сон: сон должен быть позже подъёма");
-          setTimeout(hideBanner, 1600);
-          return;
-        }
-
-        state.plan.wakeMin = wake;
-        state.plan.sleepMin = sleep;
-        state.plan.busy = collectBlocksUI();
-
-        // Rebuild today schedule
-        scheduleTargets();
-
-        // Optional notifications permission if user chose notify
-        if (state.settings.reminders.mode === "notify" && "Notification" in window && Notification.permission === "default"){
-          try{
-            const res = await Notification.requestPermission();
-            if (res !== "granted"){
-              state.settings.reminders.mode = "on";
-              setRemModeUI("on");
-            }
-          } catch {}
-        }
-
-        closePlan();
+        state.todayMl = Math.max(0, state.todayMl + state.glassMl);
         save();
         render();
-        haptic([8,18,8]);
-      });
+        haptic(12);
+      };
 
-      // settings modal
+      const removeGlass = () => {
+        ensureDayRollover();
+        state.todayMl = Math.max(0, state.todayMl - state.glassMl);
+        save();
+        render();
+        haptic(8);
+      };
+
+      els.plusBtn.addEventListener("click", addGlass);
+      els.minusBtn.addEventListener("click", removeGlass);
+
+      // ===== Settings =====
+      let draftSettings = null;
+
       const openSettings = () => {
-        els.weight.value = String(state.settings.weightKg);
-        els.glass.value = String(state.settings.glassMl);
-        els.cooldown.value = String(state.settings.cooldownMin);
-        setRemModeUI(state.settings.reminders.mode);
-        updateSettingsPreview();
+        ensureDayRollover();
+        draftSettings = { weightKg: state.weightKg, glassMl: state.glassMl };
+        els.weightInput.value = String(draftSettings.weightKg);
+        els.glassInput.value = String(draftSettings.glassMl);
+
+        els.settingsGoal.textContent = `${calcGoalMl(draftSettings.weightKg)} мл/день`;
+
         openModal(els.settingsModal);
       };
-      const closeSettings = () => closeModal(els.settingsModal);
 
-      els.settingsClose.addEventListener("click", closeSettings);
-      els.settingsCancel.addEventListener("click", closeSettings);
-      els.settingsModal.addEventListener("click", (ev) => overlayClose(els.settingsModal, ev));
+      const closeSettings = () => {
+        draftSettings = null;
+        closeModal(els.settingsModal);
+      };
 
-      // seg behavior
-      $$("button", els.remSeg).forEach(btn => btn.addEventListener("click", () => {
-        $$("button", els.remSeg).forEach(b => b.setAttribute("aria-pressed", "false"));
-        btn.setAttribute("aria-pressed", "true");
-      }));
+      const saveSettings = () => {
+        const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
+        const g = clamp(Math.round(parseFloat(els.glassInput.value || "0")), 50, 2000);
 
-      els.settingsSave.addEventListener("click", async () => {
-        const w = clamp(parseFloat(els.weight.value || "0"), 20, 250);
-        const g = clamp(Math.round(parseFloat(els.glass.value || "0")), 50, 2000);
-        const cd = clamp(Math.round(parseFloat(els.cooldown.value || "0")), 5, 180);
+        state.weightKg = Number.isFinite(w) ? w : state.weightKg;
+        state.glassMl  = Number.isFinite(g) ? g : state.glassMl;
 
-        state.settings.weightKg = Number.isFinite(w) ? w : state.settings.weightKg;
-        state.settings.glassMl = Number.isFinite(g) ? g : state.settings.glassMl;
-        state.settings.cooldownMin = Number.isFinite(cd) ? cd : state.settings.cooldownMin;
-
-        const mode = getRemModeUI();
-        state.settings.reminders.mode = mode;
-
-        if (mode === "notify" && "Notification" in window){
-          if (Notification.permission === "default"){
-            try{
-              const res = await Notification.requestPermission();
-              if (res !== "granted"){
-                state.settings.reminders.mode = "on";
-                setRemModeUI("on");
-              }
-            } catch {
-              state.settings.reminders.mode = "on";
-              setRemModeUI("on");
-            }
-          } else if (Notification.permission !== "granted"){
-            state.settings.reminders.mode = "on";
-            setRemModeUI("on");
-          }
-        }
-
-        // if plan exists, rebuild schedule (goal/glass/cooldown affects it)
-        if (state.plan.wakeMin != null) scheduleTargets();
-
-        closeSettings();
         save();
         render();
-        haptic([8,18,8]);
-      });
+        closeSettings();
+        haptic([8, 18, 8]);
+      };
 
-      // stats
+      els.settingsBtn.addEventListener("click", openSettings);
+      els.settingsClose.addEventListener("click", closeSettings);
+      els.settingsCancel.addEventListener("click", closeSettings);
+      els.settingsSave.addEventListener("click", saveSettings);
+      els.settingsModal.addEventListener("click", (ev) => onOverlayClickToClose(els.settingsModal, ev));
+
+      const updateDraftGoal = () => {
+        const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
+        els.settingsGoal.textContent = `${calcGoalMl(w)} мл/день`;
+      };
+
+      els.weightInput.addEventListener("input", updateDraftGoal);
+
+      // ===== Stats =====
       const openStats = () => {
         renderStats();
         openModal(els.statsModal);
       };
+
       const closeStats = () => closeModal(els.statsModal);
 
+      els.statsBtn.addEventListener("click", openStats);
       els.statsClose.addEventListener("click", closeStats);
-      els.statsModal.addEventListener("click", (ev) => overlayClose(els.statsModal, ev));
+      els.statsModal.addEventListener("click", (ev) => onOverlayClickToClose(els.statsModal, ev));
 
-      const renderStats = () => {
-        ensureDayRollover();
-        const t = todayISO();
-        const map = new Map((state.history||[]).map(h => [h.date, h]));
-        const goalToday = goalMl();
-        const plannedToday = state.day.targets?.length || 0;
-        const doneToday = countDoneTargets(state.day.targets, state.day.events);
-        const mlToday = todayMl();
-
-        els.statsList.innerHTML = "";
-
-        let sum=0, hits=0, planSum=0, doneSum=0;
-
-        for (let i=6; i>=0; i--){
-          const date = addDays(t, -i);
-          const isToday = date === t;
-          const h = map.get(date);
-
-          const ml = isToday ? mlToday : (h?.ml || 0);
-          const goal = isToday ? goalToday : (h?.goalMl || goalToday);
-          const planned = isToday ? plannedToday : (h?.planned || 0);
-          const done = isToday ? doneToday : (h?.done || 0);
-
-          const pct = goal>0 ? Math.round((ml/goal)*100) : 0;
-          const bar = clamp(pct,0,100);
-
-          sum += ml;
-          if (pct>=100) hits++;
-          planSum += planned;
-          doneSum += done;
-
-          const item = document.createElement("div");
-          item.className = "stat";
-          item.innerHTML = `
-            <div class="statTop">
-              <div class="statDate">${isToday ? "сегодня" : wday(date)} • <b>${dm(date)}</b></div>
-              <div class="statVal">${ml} / ${goal} ml</div>
-            </div>
-            <div class="bar" aria-hidden="true"><i style="width:${bar}%"></i></div>
-            <div style="display:flex; justify-content:space-between; gap:10px; color: rgba(232,251,255,.62); font-size:12px;">
-              <span>Прогресс: <b style="color: rgba(232,251,255,.90)">${pct}%</b></span>
-              <span>План: <b style="color: rgba(232,251,255,.90)">${done}/${planned}</b></span>
-            </div>
-          `;
-          els.statsList.appendChild(item);
-        }
-
-        const avg = Math.round(sum/7);
-        const planPct = planSum ? Math.round((doneSum/planSum)*100) : 0;
-        els.statsSummary.textContent = `Итого: ${sum} ml • Среднее: ${avg} ml/день • Дней 100%: ${hits}/7 • Выполнение плана: ${planPct}%`;
-      };
-
+      // Reset today
       els.resetToday.addEventListener("click", () => {
-        state.day.events = [];
-        state.day.reminder = { lastIdx:null, lastShownTs:0, dismissedUntilTs:0 };
-        hideBanner();
+        ensureDayRollover();
+        const ok = confirm("Сбросить выпитое за сегодня?");
+        if (!ok) return;
+        state.todayMl = 0;
         save();
-        render();
-        haptic([10,40,10]);
-      });
-
-      els.resetAll.addEventListener("click", () => {
-        state = defaults();
-        save();
-        hideBanner();
         render();
         renderStats();
-        haptic([12,30,12,30,12]);
+        haptic([10, 40, 10]);
       });
 
-      // keyboard
+      // Reset all
+      els.resetAll.addEventListener("click", () => {
+        const ok = confirm("Сбросить всю статистику полностью? Это удалит историю и значения.");
+        if (!ok) return;
+        const d = defaults();
+        state = d;
+        save();
+        render();
+        renderStats();
+        haptic([12, 30, 12, 30, 12]);
+      });
+
+      // ===== Keyboard (Esc) =====
       window.addEventListener("keydown", (ev) => {
-        if (ev.key === "Escape"){
-          [els.planModal, els.settingsModal, els.statsModal].forEach(m => m.classList.remove("open"));
-          hideBanner();
+        if (ev.key === "Escape") {
+          if (isOpen(els.statsModal)) closeStats();
+          if (isOpen(els.settingsModal)) closeSettings();
         }
       });
 
-      // Parallax
+      // ===== Parallax / Depth (mouse + deviceorientation) =====
       const setParallax = (nx, ny) => {
-        const px = clamp(nx, -1, 1) * 10;
+        // nx, ny in [-1..1]
+        const px = clamp(nx, -1, 1) * 10;  // px
         const py = clamp(ny, -1, 1) * 10;
         document.documentElement.style.setProperty("--parx", `${px}px`);
         document.documentElement.style.setProperty("--pary", `${py}px`);
         document.documentElement.style.setProperty("--tilt", `${(-nx * 0.6).toFixed(2)}deg`);
       };
+
+      // mouse (desktop)
       window.addEventListener("mousemove", (ev) => {
         const w = window.innerWidth || 1;
         const h = window.innerHeight || 1;
-        setParallax((ev.clientX / w) * 2 - 1, (ev.clientY / h) * 2 - 1);
-      }, { passive:true });
+        const nx = (ev.clientX / w) * 2 - 1;
+        const ny = (ev.clientY / h) * 2 - 1;
+        setParallax(nx, ny);
+      }, { passive: true });
 
+      // device orientation (mobile)
       const attachDeviceOrientation = () => {
         window.addEventListener("deviceorientation", (ev) => {
+          // gamma: left-right [-90..90], beta: front-back [-180..180]
           const gamma = Number.isFinite(ev.gamma) ? ev.gamma : 0;
           const beta  = Number.isFinite(ev.beta)  ? ev.beta  : 0;
-          setParallax(clamp(gamma/35,-1,1), clamp(beta/45,-1,1));
-        }, { passive:true });
+
+          const nx = clamp(gamma / 35, -1, 1);
+          const ny = clamp(beta / 45,  -1, 1);
+          setParallax(nx, ny);
+        }, { passive: true });
       };
+
+      // iOS needs permission – пробуем запросить по первому “человеческому” действию
       const maybeEnableMotion = async () => {
         try{
           if (typeof DeviceOrientationEvent !== "undefined" &&
@@ -2160,29 +1256,25 @@
           } else {
             attachDeviceOrientation();
           }
-        } catch {}
+        } catch {
+          // silently ignore
+        }
       };
-      window.addEventListener("pointerdown", maybeEnableMotion, { once:true, passive:true });
-      window.addEventListener("touchstart", maybeEnableMotion, { once:true, passive:true });
 
-      // ===== Boot =====
-      let state = load();
-      ensureDayRollover();
+      // trigger permission request on first tap/click (iOS-friendly)
+      const once = { once: true, passive: true };
+      window.addEventListener("pointerdown", maybeEnableMotion, once);
+      window.addEventListener("touchstart", maybeEnableMotion, once);
 
-      // init ring params
-      // (needs dasharray set once)
-      renderRing(0);
-
-      // if plan exists but targets empty (new day), build them once
-      if (state.plan.wakeMin != null) scheduleTargets();
-
-      updateSettingsPreview();
-
-      // periodic updates (smooth + no spam)
-      render();
-      setInterval(render, 10_000); // main refresh (reminders + countdown)
-      setInterval(updateCooldownUI, 1_000); // cooldown display smooth
-
+      // ===== Midnight safety check (if tab stays open) =====
+      setInterval(() => {
+        const before = state.lastDate;
+        ensureDayRollover();
+        if (state.lastDate !== before) {
+          render();
+          if (isOpen(els.statsModal)) renderStats();
+        }
+      }, 30_000);
     })();
   </script>
 </body>

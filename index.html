@@ -1,1085 +1,1822 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#050916" />
-  <meta name="color-scheme" content="dark" />
-  <title>Water Tracker • Deep Ocean Cyberpunk</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#050916" />
+    <meta name="color-scheme" content="dark" />
+    <title>Water Tracker • Deep Ocean Cyberpunk</title>
 
-  <!-- Google Font (единственная внешняя зависимость) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Google Font (единственная внешняя зависимость) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-  <style>
-    :root{
-      --bg0:#03040a;
-      --bg1:#050916;
-      --bg2:#07112a;
+    <style>
+      :root {
+        --bg0: #03040a;
+        --bg1: #050916;
+        --bg2: #07112a;
 
-      --glass: rgba(10, 18, 40, .40);
-      --glass2: rgba(10, 18, 40, .22);
-      --stroke: rgba(120, 245, 255, .18);
-      --stroke2: rgba(120, 245, 255, .10);
+        --glass: rgba(10, 18, 40, 0.4);
+        --glass2: rgba(10, 18, 40, 0.22);
+        --stroke: rgba(120, 245, 255, 0.18);
+        --stroke2: rgba(120, 245, 255, 0.1);
 
-      --cyan: #62f6ff;
-      --cyan2:#1ad7ff;
-      --cyan3:#00a9ff;
+        --cyan: #62f6ff;
+        --cyan2: #1ad7ff;
+        --cyan3: #00a9ff;
 
-      --txt: rgba(232, 251, 255, .92);
-      --muted: rgba(232, 251, 255, .62);
+        --txt: rgba(232, 251, 255, 0.92);
+        --muted: rgba(232, 251, 255, 0.62);
 
-      --shadow: 0 24px 80px rgba(0,0,0,.55);
-      --glow: 0 0 18px rgba(98, 246, 255, .40), 0 0 52px rgba(26, 215, 255, .18);
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+        --glow: 0 0 18px rgba(98, 246, 255, 0.4),
+          0 0 52px rgba(26, 215, 255, 0.18);
 
-      --r: 22px;
-      --r2: 28px;
+        --r: 22px;
+        --r2: 28px;
 
-      --p: 0;              /* 0..100 (уровень для визуализации) */
-      --parx: 0px;         /* параллакс X */
-      --pary: 0px;         /* параллакс Y */
-      --tilt: 0deg;        /* микро-поворот */
-    }
+        --p: 0; /* 0..100 (уровень для визуализации) */
+        --parx: 0px; /* параллакс X */
+        --pary: 0px; /* параллакс Y */
+        --tilt: 0deg; /* микро-поворот */
+      }
 
-    *{ box-sizing: border-box; }
-    html, body{ height: 100%; }
-    body{
-      margin:0;
-      font-family: "Rajdhani", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--txt);
-      background: radial-gradient(1200px 900px at 50% 10%, rgba(98,246,255,.08), transparent 65%),
-                  radial-gradient(900px 700px at 20% 80%, rgba(26,215,255,.05), transparent 60%),
-                  linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));
-      overflow:hidden;
-      overscroll-behavior:none;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      user-select: none;
-    }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: "Rajdhani", system-ui, -apple-system, Segoe UI, Roboto,
+          Arial, sans-serif;
+        color: var(--txt);
+        background: radial-gradient(
+            1200px 900px at 50% 10%,
+            rgba(98, 246, 255, 0.08),
+            transparent 65%
+          ),
+          radial-gradient(
+            900px 700px at 20% 80%,
+            rgba(26, 215, 255, 0.05),
+            transparent 60%
+          ),
+          linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));
+        overflow: hidden;
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        user-select: none;
+      }
 
-    /* ===== Live Background (Deep Ocean Cyberpunk) ===== */
-    .bg{
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      transform: translate3d(var(--parx), var(--pary), 0) rotate(var(--tilt));
-      transform-origin: 50% 50%;
-      will-change: transform;
-    }
-    .bg::before,
-    .bg::after{
-      content:"";
-      position:absolute;
-      inset:-12%;
-      filter: blur(10px);
-      opacity: .95;
-    }
+      /* ===== Live Background (Deep Ocean Cyberpunk) ===== */
+      .bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        transform: translate3d(var(--parx), var(--pary), 0) rotate(var(--tilt));
+        transform-origin: 50% 50%;
+        will-change: transform;
+      }
+      .bg::before,
+      .bg::after {
+        content: "";
+        position: absolute;
+        inset: -12%;
+        filter: blur(10px);
+        opacity: 0.95;
+      }
 
-    /* base flow */
-    .bg::before{
-      background:
-        radial-gradient(900px 700px at 30% 20%, rgba(98,246,255,.16), transparent 60%),
-        radial-gradient(700px 550px at 70% 70%, rgba(26,215,255,.12), transparent 58%),
-        radial-gradient(1000px 800px at 40% 90%, rgba(0,169,255,.10), transparent 62%),
-        conic-gradient(from 240deg at 50% 50%,
-          rgba(98,246,255,.14),
-          rgba(0,0,0,0),
-          rgba(26,215,255,.10),
-          rgba(0,0,0,0),
-          rgba(0,169,255,.10),
-          rgba(0,0,0,0),
-          rgba(98,246,255,.12)
+      /* base flow */
+      .bg::before {
+        background: radial-gradient(
+            900px 700px at 30% 20%,
+            rgba(98, 246, 255, 0.16),
+            transparent 60%
+          ),
+          radial-gradient(
+            700px 550px at 70% 70%,
+            rgba(26, 215, 255, 0.12),
+            transparent 58%
+          ),
+          radial-gradient(
+            1000px 800px at 40% 90%,
+            rgba(0, 169, 255, 0.1),
+            transparent 62%
+          ),
+          conic-gradient(
+            from 240deg at 50% 50%,
+            rgba(98, 246, 255, 0.14),
+            rgba(0, 0, 0, 0),
+            rgba(26, 215, 255, 0.1),
+            rgba(0, 0, 0, 0),
+            rgba(0, 169, 255, 0.1),
+            rgba(0, 0, 0, 0),
+            rgba(98, 246, 255, 0.12)
+          );
+        animation: drift 14s ease-in-out infinite;
+        mix-blend-mode: screen;
+      }
+
+      /* caustics-ish shimmer */
+      .bg::after {
+        background: repeating-radial-gradient(
+            circle at 20% 30%,
+            rgba(98, 246, 255, 0.06) 0 8px,
+            rgba(0, 0, 0, 0) 10px 24px
+          ),
+          repeating-radial-gradient(
+            circle at 80% 70%,
+            rgba(26, 215, 255, 0.05) 0 6px,
+            rgba(0, 0, 0, 0) 8px 22px
+          ),
+          radial-gradient(
+            1200px 900px at 50% 50%,
+            rgba(98, 246, 255, 0.1),
+            transparent 68%
+          );
+        opacity: 0.25;
+        animation: shimmer 10s linear infinite;
+        transform: translate3d(
+          calc(var(--parx) * -0.25),
+          calc(var(--pary) * -0.25),
+          0
         );
-      animation: drift 14s ease-in-out infinite;
-      mix-blend-mode: screen;
-    }
+      }
 
-    /* caustics-ish shimmer */
-    .bg::after{
-      background:
-        repeating-radial-gradient(circle at 20% 30%,
-          rgba(98,246,255,.06) 0 8px,
-          rgba(0,0,0,0) 10px 24px),
-        repeating-radial-gradient(circle at 80% 70%,
-          rgba(26,215,255,.05) 0 6px,
-          rgba(0,0,0,0) 8px 22px),
-        radial-gradient(1200px 900px at 50% 50%, rgba(98,246,255,.10), transparent 68%);
-      opacity: .25;
-      animation: shimmer 10s linear infinite;
-      transform: translate3d(calc(var(--parx) * -0.25), calc(var(--pary) * -0.25), 0);
-    }
+      @keyframes drift {
+        0% {
+          transform: translate3d(-1.5%, -1.2%, 0) scale(1.02);
+        }
+        50% {
+          transform: translate3d(1.8%, 1%, 0) scale(1.04);
+        }
+        100% {
+          transform: translate3d(-1.5%, -1.2%, 0) scale(1.02);
+        }
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 0 0, 0 0, 0 0;
+        }
+        100% {
+          background-position: 420px 260px, -360px -220px, 0 0;
+        }
+      }
 
-    @keyframes drift{
-      0%   { transform: translate3d(-1.5%, -1.2%, 0) scale(1.02); }
-      50%  { transform: translate3d( 1.8%,  1.0%, 0) scale(1.04); }
-      100% { transform: translate3d(-1.5%, -1.2%, 0) scale(1.02); }
-    }
-    @keyframes shimmer{
-      0%   { background-position: 0 0, 0 0, 0 0; }
-      100% { background-position: 420px 260px, -360px -220px, 0 0; }
-    }
+      /* ===== App Layout ===== */
+      .app {
+        position: relative;
+        z-index: 1;
+        min-height: 100dvh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        padding: max(16px, env(safe-area-inset-top)) 16px
+          max(16px, env(safe-area-inset-bottom));
+        gap: 14px;
+      }
 
-    /* ===== App Layout ===== */
-    .app{
-      position: relative;
-      z-index: 1;
-      min-height: 100dvh;
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
-      gap: 14px;
-    }
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 10px 8px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      opacity:.95;
-    }
-    .brand__mark{
-      width: 34px; height: 34px;
-      border-radius: 12px;
-      background:
-        radial-gradient(12px 12px at 30% 30%, rgba(98,246,255,.65), rgba(98,246,255,.12) 55%, rgba(0,0,0,0) 70%),
-        linear-gradient(135deg, rgba(98,246,255,.25), rgba(10,18,40,.1));
-      border: 1px solid var(--stroke);
-      box-shadow: var(--glow);
-      position: relative;
-      overflow:hidden;
-    }
-    .brand__mark::after{
-      content:"";
-      position:absolute;
-      inset:-30%;
-      background: conic-gradient(from 180deg,
-        rgba(98,246,255,.0),
-        rgba(98,246,255,.18),
-        rgba(98,246,255,.0));
-      animation: spin 4.8s linear infinite;
-      opacity:.75;
-    }
-    @keyframes spin{ to{ transform: rotate(360deg); } }
-
-    .brand__name{
-      font-family: "Orbitron", sans-serif;
-      letter-spacing: .06em;
-      font-weight: 700;
-      font-size: 14px;
-      color: rgba(232, 251, 255, .88);
-      text-transform: uppercase;
-      line-height: 1.1;
-    }
-    .brand__sub{
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-      letter-spacing: .02em;
-    }
-
-    .hint{
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(10, 18, 40, .22);
-      border: 1px solid rgba(120, 245, 255, .12);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      color: rgba(232, 251, 255, .70);
-      font-size: 12px;
-      box-shadow: 0 10px 32px rgba(0,0,0,.35);
-    }
-    .hint svg{ opacity:.8; }
-
-    .center{
-      display:grid;
-      place-items:center;
-      padding: 10px 0;
-    }
-
-    /* ===== Gauge (Glass + Water) ===== */
-    .gauge-wrap{
-      width: min(420px, 100%);
-      display:grid;
-      place-items:center;
-      gap: 18px;
-    }
-
-    .gauge{
-      width: min(320px, 84vw);
-      aspect-ratio: 1 / 1;
-      position: relative;
-      border-radius: 999px;
-      filter: drop-shadow(0 18px 60px rgba(0,0,0,.55));
-    }
-
-    .ring{
-      position:absolute;
-      inset: 0;
-      border-radius: 999px;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 56%, rgba(0,0,0,.55) 72%, rgba(0,0,0,0) 78%),
-        conic-gradient(
-          from -90deg,
-          rgba(98,246,255,.95) calc(var(--p) * 1%),
-          rgba(120,245,255,.12) 0
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 8px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        opacity: 0.95;
+      }
+      .brand__mark {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        background: radial-gradient(
+            12px 12px at 30% 30%,
+            rgba(98, 246, 255, 0.65),
+            rgba(98, 246, 255, 0.12) 55%,
+            rgba(0, 0, 0, 0) 70%
+          ),
+          linear-gradient(
+            135deg,
+            rgba(98, 246, 255, 0.25),
+            rgba(10, 18, 40, 0.1)
+          );
+        border: 1px solid var(--stroke);
+        box-shadow: var(--glow);
+        position: relative;
+        overflow: hidden;
+      }
+      .brand__mark::after {
+        content: "";
+        position: absolute;
+        inset: -30%;
+        background: conic-gradient(
+          from 180deg,
+          rgba(98, 246, 255, 0),
+          rgba(98, 246, 255, 0.18),
+          rgba(98, 246, 255, 0)
         );
-      mask: radial-gradient(circle at 50% 50%, transparent 61%, #000 62%);
-      -webkit-mask: radial-gradient(circle at 50% 50%, transparent 61%, #000 62%);
-      box-shadow: var(--glow);
-      opacity: .95;
-      animation: ringPulse 3.6s ease-in-out infinite;
-    }
-    @keyframes ringPulse{
-      0%,100%{ filter: saturate(1.05) brightness(1.0); }
-      50%{ filter: saturate(1.25) brightness(1.08); }
-    }
+        animation: spin 4.8s linear infinite;
+        opacity: 0.75;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-    .glass{
-      position:absolute;
-      inset: 14px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(10,18,40,.45), rgba(10,18,40,.20));
-      border: 1px solid rgba(120, 245, 255, .16);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.10), inset 0 -10px 30px rgba(0,0,0,.25);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      overflow:hidden;
-    }
+      .brand__name {
+        font-family: "Orbitron", sans-serif;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+        font-size: 14px;
+        color: rgba(232, 251, 255, 0.88);
+        text-transform: uppercase;
+        line-height: 1.1;
+      }
+      .brand__sub {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+        letter-spacing: 0.02em;
+      }
 
-    .water{
-      position:absolute;
-      inset: 0;
-      top: calc((100 - var(--p)) * 1%);
-      transition: top 420ms cubic-bezier(.2,.85,.2,1);
-      background:
-        radial-gradient(240px 160px at 30% 20%, rgba(98,246,255,.40), rgba(98,246,255,.12) 55%, rgba(0,0,0,0) 72%),
-        linear-gradient(180deg, rgba(98,246,255,.14), rgba(26,215,255,.08));
-      filter: saturate(1.1);
-    }
+      .hint {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(10, 18, 40, 0.22);
+        border: 1px solid rgba(120, 245, 255, 0.12);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        color: rgba(232, 251, 255, 0.7);
+        font-size: 12px;
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+      }
+      .hint svg {
+        opacity: 0.8;
+      }
 
-    .wave{
-      position:absolute;
-      inset: -30% -20% -30% -20%;
-      opacity: .85;
-      background:
-        radial-gradient(18px 12px at 10% 30%, rgba(98,246,255,.35), rgba(0,0,0,0) 70%),
-        radial-gradient(18px 12px at 55% 60%, rgba(26,215,255,.26), rgba(0,0,0,0) 70%),
-        radial-gradient(18px 12px at 85% 40%, rgba(0,169,255,.22), rgba(0,0,0,0) 70%),
-        repeating-linear-gradient(90deg,
-          rgba(98,246,255,.10) 0 26px,
-          rgba(0,0,0,0) 26px 54px);
-      transform: translate3d(0,0,0);
-      mix-blend-mode: screen;
-      animation: waves 3.8s linear infinite;
-    }
-    .wave.w2{
-      opacity: .55;
-      filter: blur(1.5px);
-      animation-duration: 5.6s;
-      animation-direction: reverse;
-    }
-    @keyframes waves{
-      0%{ transform: translate3d(-4%, 2%, 0) rotate(-1deg); }
-      100%{ transform: translate3d(4%, -2%, 0) rotate(1deg); }
-    }
+      .center {
+        display: grid;
+        place-items: center;
+        padding: 10px 0;
+      }
 
-    .gauge-content{
-      position:absolute;
-      inset: 0;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      padding: 42px 18px;
-    }
+      /* ===== Gauge (Glass + Water) ===== */
+      .gauge-wrap {
+        width: min(420px, 100%);
+        display: grid;
+        place-items: center;
+        gap: 18px;
+      }
 
-    .percent{
-      font-family:"Orbitron", sans-serif;
-      font-weight: 800;
-      letter-spacing: .04em;
-      font-size: clamp(44px, 10vw, 64px);
-      line-height: 1;
-      text-shadow: 0 0 26px rgba(98,246,255,.28);
-    }
-    .amount{
-      margin-top: 10px;
-      font-size: 15px;
-      color: rgba(232, 251, 255, .74);
-      letter-spacing: .02em;
-    }
-    .goal-note{
-      margin-top: 8px;
-      font-size: 12px;
-      color: rgba(232, 251, 255, .52);
-    }
+      .gauge {
+        width: min(320px, 84vw);
+        aspect-ratio: 1 / 1;
+        position: relative;
+        border-radius: 999px;
+        filter: drop-shadow(0 18px 60px rgba(0, 0, 0, 0.55));
+      }
 
-    /* ===== Controls ===== */
-    .controls{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap: 14px;
-      margin-top: 4px;
-    }
+      .ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background: radial-gradient(
+            circle at 50% 50%,
+            rgba(0, 0, 0, 0) 56%,
+            rgba(0, 0, 0, 0.55) 72%,
+            rgba(0, 0, 0, 0) 78%
+          ),
+          conic-gradient(
+            from -90deg,
+            rgba(98, 246, 255, 0.95) calc(var(--p) * 1%),
+            rgba(120, 245, 255, 0.12) 0
+          );
+        mask: radial-gradient(circle at 50% 50%, transparent 61%, #000 62%);
+        -webkit-mask: radial-gradient(
+          circle at 50% 50%,
+          transparent 61%,
+          #000 62%
+        );
+        box-shadow: var(--glow);
+        opacity: 0.95;
+        animation: ringPulse 3.6s ease-in-out infinite;
+      }
+      @keyframes ringPulse {
+        0%,
+        100% {
+          filter: saturate(1.05) brightness(1);
+        }
+        50% {
+          filter: saturate(1.25) brightness(1.08);
+        }
+      }
 
-    .btn{
-      border: 1px solid var(--stroke);
-      background: linear-gradient(180deg, rgba(10,18,40,.55), rgba(10,18,40,.26));
-      color: var(--txt);
-      border-radius: 999px;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.08);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap: 10px;
-      cursor:pointer;
-      transition: transform 120ms ease, border-color 180ms ease, box-shadow 240ms ease, background 240ms ease;
-      outline: none;
-      -webkit-user-select:none;
-      user-select:none;
-    }
-    .btn:active{ transform: translateY(1px) scale(.99); }
-    .btn:focus-visible{
-      box-shadow: var(--shadow), 0 0 0 2px rgba(98,246,255,.25), var(--glow);
-      border-color: rgba(98,246,255,.35);
-    }
+      .glass {
+        position: absolute;
+        inset: 14px;
+        border-radius: 999px;
+        background: linear-gradient(
+          180deg,
+          rgba(10, 18, 40, 0.45),
+          rgba(10, 18, 40, 0.2)
+        );
+        border: 1px solid rgba(120, 245, 255, 0.16);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          inset 0 -10px 30px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        overflow: hidden;
+      }
 
-    .btn--big{
-      width: 86px; height: 86px;
-      border-color: rgba(98,246,255,.28);
-      box-shadow: var(--shadow), var(--glow), inset 0 1px 0 rgba(255,255,255,.10);
-      position: relative;
-      overflow:hidden;
-    }
-    .btn--big::before{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background: conic-gradient(from 0deg,
-        rgba(98,246,255,.00),
-        rgba(98,246,255,.14),
-        rgba(98,246,255,.00),
-        rgba(26,215,255,.10),
-        rgba(98,246,255,.00));
-      animation: spin 5.5s linear infinite;
-      opacity:.95;
-    }
-    .btn--big svg{ position:relative; z-index: 1; filter: drop-shadow(0 0 14px rgba(98,246,255,.35)); }
+      .water {
+        position: absolute;
+        inset: 0;
+        top: calc((100 - var(--p)) * 1%);
+        transition: top 420ms cubic-bezier(0.2, 0.85, 0.2, 1);
+        background: radial-gradient(
+            240px 160px at 30% 20%,
+            rgba(98, 246, 255, 0.4),
+            rgba(98, 246, 255, 0.12) 55%,
+            rgba(0, 0, 0, 0) 72%
+          ),
+          linear-gradient(
+            180deg,
+            rgba(98, 246, 255, 0.14),
+            rgba(26, 215, 255, 0.08)
+          );
+        filter: saturate(1.1);
+      }
 
-    .btn--small{
-      width: 56px; height: 56px;
-      border-color: rgba(120,245,255,.18);
-      opacity: .92;
-    }
-    .btn--small:hover{ border-color: rgba(98,246,255,.30); }
+      .wave {
+        position: absolute;
+        inset: -30% -20% -30% -20%;
+        opacity: 0.85;
+        background: radial-gradient(
+            18px 12px at 10% 30%,
+            rgba(98, 246, 255, 0.35),
+            rgba(0, 0, 0, 0) 70%
+          ),
+          radial-gradient(
+            18px 12px at 55% 60%,
+            rgba(26, 215, 255, 0.26),
+            rgba(0, 0, 0, 0) 70%
+          ),
+          radial-gradient(
+            18px 12px at 85% 40%,
+            rgba(0, 169, 255, 0.22),
+            rgba(0, 0, 0, 0) 70%
+          ),
+          repeating-linear-gradient(
+            90deg,
+            rgba(98, 246, 255, 0.1) 0 26px,
+            rgba(0, 0, 0, 0) 26px 54px
+          );
+        transform: translate3d(0, 0, 0);
+        mix-blend-mode: screen;
+        animation: waves 3.8s linear infinite;
+      }
+      .wave.w2 {
+        opacity: 0.55;
+        filter: blur(1.5px);
+        animation-duration: 5.6s;
+        animation-direction: reverse;
+      }
+      @keyframes waves {
+        0% {
+          transform: translate3d(-4%, 2%, 0) rotate(-1deg);
+        }
+        100% {
+          transform: translate3d(4%, -2%, 0) rotate(1deg);
+        }
+      }
 
-    /* ===== Bottom Nav (subtle) ===== */
-    .bottom{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      padding: 10px 6px 4px;
-    }
-    .navbtn{
-      width: 52px; height: 44px;
-      border-radius: 16px;
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.18);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 14px 42px rgba(0,0,0,.35);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      transition: transform 120ms ease, border-color 200ms ease, background 200ms ease, box-shadow 240ms ease;
-      outline:none;
-    }
-    .navbtn svg{ opacity:.86; }
-    .navbtn:active{ transform: translateY(1px); }
-    .navbtn:focus-visible{
-      border-color: rgba(98,246,255,.30);
-      box-shadow: 0 14px 42px rgba(0,0,0,.35), 0 0 0 2px rgba(98,246,255,.22);
-    }
+      .gauge-content {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 42px 18px;
+      }
 
-    /* ===== Modals ===== */
-    .modal{
-      position: fixed;
-      inset: 0;
-      z-index: 10;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-      background: rgba(2, 4, 10, .55);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 220ms ease;
-    }
-    .modal.is-open{
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .sheet{
-      width: min(520px, 100%);
-      border-radius: var(--r2);
-      background: linear-gradient(180deg, rgba(10,18,40,.55), rgba(10,18,40,.25));
-      border: 1px solid rgba(120,245,255,.18);
-      box-shadow: 0 30px 120px rgba(0,0,0,.70), var(--glow);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      overflow: hidden;
-      transform: translateY(10px) scale(.985);
-      transition: transform 240ms cubic-bezier(.2,.85,.2,1);
-    }
-    .modal.is-open .sheet{ transform: translateY(0) scale(1); }
+      .percent {
+        font-family: "Orbitron", sans-serif;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        font-size: clamp(44px, 10vw, 64px);
+        line-height: 1;
+        text-shadow: 0 0 26px rgba(98, 246, 255, 0.28);
+      }
+      .amount {
+        margin-top: 10px;
+        font-size: 15px;
+        color: rgba(232, 251, 255, 0.74);
+        letter-spacing: 0.02em;
+      }
+      .goal-note {
+        margin-top: 8px;
+        font-size: 12px;
+        color: rgba(232, 251, 255, 0.52);
+      }
 
-    .sheet__head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(120,245,255,.10);
-      background: rgba(10,18,40,.20);
-    }
-    .sheet__title{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      font-family:"Orbitron", sans-serif;
-      letter-spacing:.05em;
-      font-weight: 700;
-      font-size: 14px;
-      text-transform: uppercase;
-      color: rgba(232, 251, 255, .88);
-    }
-    .close{
-      width: 42px; height: 38px;
-      border-radius: 14px;
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.20);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      transition: transform 120ms ease, border-color 200ms ease;
-      outline:none;
-    }
-    .close:active{ transform: translateY(1px); }
-    .close:focus-visible{ border-color: rgba(98,246,255,.30); }
+      .streak-info {
+        margin-top: 16px;
+        text-align: center;
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .streak-info strong {
+        color: var(--cyan);
+      }
 
-    .sheet__body{
-      padding: 16px;
-      display:grid;
-      gap: 14px;
-    }
+      /* ===== Controls ===== */
+      .controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        margin-top: 4px;
+      }
 
-    .field{
-      display:grid;
-      gap: 8px;
-    }
-    .label{
-      color: rgba(232, 251, 255, .78);
-      font-weight: 600;
-      letter-spacing: .02em;
-      font-size: 13px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-    }
-    .label small{
-      font-weight: 600;
-      color: rgba(232, 251, 255, .52);
-    }
+      .btn {
+        border: 1px solid var(--stroke);
+        background: linear-gradient(
+          180deg,
+          rgba(10, 18, 40, 0.55),
+          rgba(10, 18, 40, 0.26)
+        );
+        color: var(--txt);
+        border-radius: 999px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: transform 120ms ease, border-color 180ms ease,
+          box-shadow 240ms ease, background 240ms ease;
+        outline: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      .btn:active {
+        transform: translateY(1px) scale(0.99);
+      }
+      .btn:focus-visible {
+        box-shadow: var(--shadow), 0 0 0 2px rgba(98, 246, 255, 0.25),
+          var(--glow);
+        border-color: rgba(98, 246, 255, 0.35);
+      }
 
-    .input{
-      width: 100%;
-      border-radius: 16px;
-      border: 1px solid rgba(120,245,255,.14);
-      background: rgba(10,18,40,.22);
-      color: rgba(232, 251, 255, .92);
-      padding: 12px 12px;
-      font-size: 16px;
-      outline:none;
-      transition: border-color 200ms ease, box-shadow 220ms ease;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
-    }
-    .input:focus{
-      border-color: rgba(98,246,255,.30);
-      box-shadow: 0 0 0 2px rgba(98,246,255,.16);
-    }
-    input[type="number"]{ appearance: textfield; }
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button{
-      -webkit-appearance: none;
-      margin: 0;
-    }
+      .btn--big {
+        width: 86px;
+        height: 86px;
+        border-color: rgba(98, 246, 255, 0.28);
+        box-shadow: var(--shadow), var(--glow),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+      .btn--big::before {
+        content: "";
+        position: absolute;
+        inset: -40%;
+        background: conic-gradient(
+          from 0deg,
+          rgba(98, 246, 255, 0),
+          rgba(98, 246, 255, 0.14),
+          rgba(98, 246, 255, 0),
+          rgba(26, 215, 255, 0.1),
+          rgba(98, 246, 255, 0)
+        );
+        animation: spin 5.5s linear infinite;
+        opacity: 0.95;
+      }
+      .btn--big svg {
+        position: relative;
+        z-index: 1;
+        filter: drop-shadow(0 0 14px rgba(98, 246, 255, 0.35));
+      }
 
-    .row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 420px){
-      .row{ grid-template-columns: 1fr; }
-    }
+      .btn--small {
+        width: 56px;
+        height: 56px;
+        border-color: rgba(120, 245, 255, 0.18);
+        opacity: 0.92;
+      }
+      .btn--small:hover {
+        border-color: rgba(98, 246, 255, 0.3);
+      }
 
-    .actions{
-      display:flex;
-      gap: 10px;
-      justify-content:flex-end;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-    .btnline{
-      padding: 10px 14px;
-      border-radius: 16px;
-      font-weight: 700;
-      letter-spacing: .02em;
-      font-size: 14px;
-    }
-    .btnline.primary{
-      border-color: rgba(98,246,255,.30);
-      box-shadow: 0 18px 60px rgba(0,0,0,.45), 0 0 24px rgba(98,246,255,.24);
-    }
-    .btnline.danger{
-      border-color: rgba(98,246,255,.14);
-      opacity: .95;
-    }
+      /* ===== Bottom Nav (subtle) ===== */
+      .bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 6px 4px;
+      }
+      .navbtn {
+        width: 52px;
+        height: 44px;
+        border-radius: 16px;
+        border: 1px solid rgba(120, 245, 255, 0.14);
+        background: rgba(10, 18, 40, 0.18);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 14px 42px rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 120ms ease, border-color 200ms ease,
+          background 200ms ease, box-shadow 240ms ease;
+        outline: none;
+      }
+      .navbtn svg {
+        opacity: 0.86;
+      }
+      .navbtn:active {
+        transform: translateY(1px);
+      }
+      .navbtn:focus-visible {
+        border-color: rgba(98, 246, 255, 0.3);
+        box-shadow: 0 14px 42px rgba(0, 0, 0, 0.35),
+          0 0 0 2px rgba(98, 246, 255, 0.22);
+      }
 
-    .divider{
-      height: 1px;
-      background: rgba(120,245,255,.10);
-      margin: 4px 0;
-    }
+      /* ===== Modals ===== */
+      .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        background: rgba(2, 4, 10, 0.55);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 220ms ease;
+      }
+      .modal.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .sheet {
+        width: min(520px, 100%);
+        border-radius: var(--r2);
+        background: linear-gradient(
+          180deg,
+          rgba(10, 18, 40, 0.55),
+          rgba(10, 18, 40, 0.25)
+        );
+        border: 1px solid rgba(120, 245, 255, 0.18);
+        box-shadow: 0 30px 120px rgba(0, 0, 0, 0.7), var(--glow);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        overflow: hidden;
+        transform: translateY(10px) scale(0.985);
+        transition: transform 240ms cubic-bezier(0.2, 0.85, 0.2, 1);
+      }
+      .modal.is-open .sheet {
+        transform: translateY(0) scale(1);
+      }
 
-    /* ===== Stats list ===== */
-    .stats{
-      display:grid;
-      gap: 10px;
-    }
-    .statrow{
-      display:grid;
-      grid-template-columns: 84px 1fr;
-      gap: 12px;
-      align-items:center;
-      padding: 10px 10px;
-      border-radius: 18px;
-      border: 1px solid rgba(120,245,255,.12);
-      background: rgba(10,18,40,.16);
-    }
-    .date{
-      font-family:"Orbitron", sans-serif;
-      font-size: 11px;
-      letter-spacing: .05em;
-      color: rgba(232, 251, 255, .70);
-      text-transform: uppercase;
-      line-height: 1.25;
-    }
-    .date b{
-      display:block;
-      font-size: 12px;
-      color: rgba(232, 251, 255, .92);
-      margin-top: 2px;
-    }
-    .bar{
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(120,245,255,.08);
-      border: 1px solid rgba(120,245,255,.10);
-      overflow:hidden;
-      position: relative;
-    }
-    .bar > i{
-      display:block;
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, rgba(98,246,255,.85), rgba(0,169,255,.55));
-      box-shadow: 0 0 18px rgba(98,246,255,.25);
-      border-radius: 999px;
-      transition: width 520ms cubic-bezier(.2,.85,.2,1);
-    }
-    .meta{
-      display:flex;
-      justify-content:space-between;
-      gap: 10px;
-      margin-top: 8px;
-      color: rgba(232, 251, 255, .62);
-      font-size: 13px;
-    }
-    .meta strong{
-      color: rgba(232, 251, 255, .88);
-      font-weight: 700;
-    }
+      .sheet__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(120, 245, 255, 0.1);
+        background: rgba(10, 18, 40, 0.2);
+      }
+      .sheet__title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "Orbitron", sans-serif;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        font-size: 14px;
+        text-transform: uppercase;
+        color: rgba(232, 251, 255, 0.88);
+      }
+      .close {
+        width: 42px;
+        height: 38px;
+        border-radius: 14px;
+        border: 1px solid rgba(120, 245, 255, 0.14);
+        background: rgba(10, 18, 40, 0.2);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 120ms ease, border-color 200ms ease;
+        outline: none;
+      }
+      .close:active {
+        transform: translateY(1px);
+      }
+      .close:focus-visible {
+        border-color: rgba(98, 246, 255, 0.3);
+      }
 
-    /* subtle footer safe area */
-    .safe{
-      height: max(0px, env(safe-area-inset-bottom));
-    }
+      .sheet__body {
+        padding: 16px;
+        display: grid;
+        gap: 14px;
+      }
 
-    /* reduce motion */
-    @media (prefers-reduced-motion: reduce){
-      .bg::before, .bg::after, .ring, .btn--big::before, .wave{ animation: none !important; }
-      .water, .bar > i, .modal, .sheet{ transition: none !important; }
-    }
-  </style>
-</head>
+      .field {
+        display: grid;
+        gap: 8px;
+      }
+      .label {
+        color: rgba(232, 251, 255, 0.78);
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .label small {
+        font-weight: 600;
+        color: rgba(232, 251, 255, 0.52);
+      }
 
-<body>
-  <div class="bg" aria-hidden="true"></div>
+      .input {
+        width: 100%;
+        border-radius: 16px;
+        border: 1px solid rgba(120, 245, 255, 0.14);
+        background: rgba(10, 18, 40, 0.22);
+        color: rgba(232, 251, 255, 0.92);
+        padding: 12px 12px;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 200ms ease, box-shadow 220ms ease;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      }
+      .input:focus {
+        border-color: rgba(98, 246, 255, 0.3);
+        box-shadow: 0 0 0 2px rgba(98, 246, 255, 0.16);
+      }
+      input[type="number"] {
+        appearance: textfield;
+      }
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
 
-  <div class="app">
-    <div class="topbar">
-      <div class="brand">
-        <div class="brand__mark" aria-hidden="true"></div>
-        <div>
-          <div class="brand__name">Water Tracker</div>
-          <div class="brand__sub" id="subline">Deep Ocean Cyberpunk</div>
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      @media (max-width: 420px) {
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        margin-top: 4px;
+      }
+      .btnline {
+        padding: 10px 14px;
+        border-radius: 16px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        font-size: 14px;
+      }
+      .btnline.primary {
+        border-color: rgba(98, 246, 255, 0.3);
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45),
+          0 0 24px rgba(98, 246, 255, 0.24);
+      }
+      .btnline.danger {
+        border-color: rgba(98, 246, 255, 0.14);
+        opacity: 0.95;
+      }
+
+      .divider {
+        height: 1px;
+        background: rgba(120, 245, 255, 0.1);
+        margin: 4px 0;
+      }
+
+      /* ===== Stats list ===== */
+      .stats {
+        display: grid;
+        gap: 10px;
+        max-height: 50vh;
+        overflow-y: auto;
+        padding-right: 6px;
+      }
+      .stats::-webkit-scrollbar {
+        width: 4px;
+      }
+      .stats::-webkit-scrollbar-thumb {
+        background: rgba(120, 245, 255, 0.18);
+        border-radius: 999px;
+      }
+      .stats::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .statrow {
+        display: grid;
+        grid-template-columns: 84px 1fr;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 10px;
+        border-radius: 18px;
+        border: 1px solid rgba(120, 245, 255, 0.12);
+        background: rgba(10, 18, 40, 0.16);
+      }
+      .date {
+        font-family: "Orbitron", sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        color: rgba(232, 251, 255, 0.7);
+        text-transform: uppercase;
+        line-height: 1.25;
+      }
+      .date b {
+        display: block;
+        font-size: 12px;
+        color: rgba(232, 251, 255, 0.92);
+        margin-top: 2px;
+      }
+      .bar {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(120, 245, 255, 0.08);
+        border: 1px solid rgba(120, 245, 255, 0.1);
+        overflow: hidden;
+        position: relative;
+      }
+      .bar > i {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(
+          90deg,
+          rgba(98, 246, 255, 0.85),
+          rgba(0, 169, 255, 0.55)
+        );
+        box-shadow: 0 0 18px rgba(98, 246, 255, 0.25);
+        border-radius: 999px;
+        transition: width 520ms cubic-bezier(0.2, 0.85, 0.2, 1);
+      }
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 8px;
+        color: rgba(232, 251, 255, 0.62);
+        font-size: 13px;
+      }
+      .meta strong {
+        color: rgba(232, 251, 255, 0.88);
+        font-weight: 700;
+      }
+
+      /* subtle footer safe area */
+      .safe {
+        height: max(0px, env(safe-area-inset-bottom));
+      }
+
+      /* ===== Custom Add Modal ===== */
+      .custom-add {
+        display: grid;
+        gap: 12px;
+      }
+      .custom-add .input {
+        text-align: center;
+      }
+
+      /* reduce motion */
+      @media (prefers-reduced-motion: reduce) {
+        .bg::before,
+        .bg::after,
+        .ring,
+        .btn--big::before,
+        .wave {
+          animation: none !important;
+        }
+        .water,
+        .bar > i,
+        .modal,
+        .sheet {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="bg" aria-hidden="true"></div>
+
+    <div class="app">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand__mark" aria-hidden="true"></div>
+          <div>
+            <div class="brand__name">Water Tracker</div>
+            <div class="brand__sub" id="subline">Deep Ocean Cyberpunk</div>
+          </div>
+        </div>
+
+        <div class="hint" id="hint">
+          <!-- droplet icon -->
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 2C12 2 6 9.2 6 13.8C6 17.8 8.9 21 12 21C15.1 21 18 17.8 18 13.8C18 9.2 12 2 12 2Z"
+              stroke="rgba(98,246,255,.85)"
+              stroke-width="1.6"
+            />
+            <path
+              d="M9.4 14.1C9.6 16.2 10.9 17.6 12.6 18.1"
+              stroke="rgba(98,246,255,.55)"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span id="hintText">+ добавляет стакан</span>
         </div>
       </div>
 
-      <div class="hint" id="hint">
-        <!-- droplet icon -->
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 2C12 2 6 9.2 6 13.8C6 17.8 8.9 21 12 21C15.1 21 18 17.8 18 13.8C18 9.2 12 2 12 2Z"
-                stroke="rgba(98,246,255,.85)" stroke-width="1.6"/>
-          <path d="M9.4 14.1C9.6 16.2 10.9 17.6 12.6 18.1"
-                stroke="rgba(98,246,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-        <span id="hintText">+ добавляет стакан</span>
-      </div>
-    </div>
+      <div class="center">
+        <div class="gauge-wrap">
+          <div class="gauge" aria-label="Прогресс гидратации">
+            <div class="ring" aria-hidden="true"></div>
+            <div class="glass">
+              <div class="water" id="water" aria-hidden="true">
+                <div class="wave"></div>
+                <div class="wave w2"></div>
+              </div>
+            </div>
 
-    <div class="center">
-      <div class="gauge-wrap">
-        <div class="gauge" aria-label="Прогресс гидратации">
-          <div class="ring" aria-hidden="true"></div>
-          <div class="glass">
-            <div class="water" id="water" aria-hidden="true">
-              <div class="wave"></div>
-              <div class="wave w2"></div>
+            <div class="gauge-content">
+              <div class="percent" id="percent">0%</div>
+              <div class="amount" id="amount">0 / 0 ml</div>
+              <div class="goal-note" id="goalNote">
+                Цель: 0 ml • Стакан: 250 ml
+              </div>
             </div>
           </div>
 
-          <div class="gauge-content">
-            <div class="percent" id="percent">0%</div>
-            <div class="amount" id="amount">0 / 0 ml</div>
-            <div class="goal-note" id="goalNote">Цель: 0 ml • Стакан: 250 ml</div>
+          <div class="streak-info" id="streakInfo">
+            Серия: 0 дней • Всего дней: 1
+          </div>
+
+          <div class="controls" aria-label="Управление">
+            <button
+              class="btn btn--small"
+              id="minusBtn"
+              type="button"
+              aria-label="Убавить стакан"
+            >
+              <!-- minus icon -->
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M6.5 12H17.5"
+                  stroke="rgba(232,251,255,.92)"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+
+            <button
+              class="btn btn--big"
+              id="plusBtn"
+              type="button"
+              aria-label="Добавить стакан"
+            >
+              <!-- plus icon -->
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 6.5V17.5"
+                  stroke="rgba(232,251,255,.92)"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M6.5 12H17.5"
+                  stroke="rgba(232,251,255,.92)"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+
+            <button
+              class="btn btn--small"
+              id="customBtn"
+              type="button"
+              aria-label="Добавить кастомное количество"
+            >
+              <!-- edit icon -->
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 20h16"
+                  stroke="rgba(232,251,255,.92)"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M16.5 3.5l4 4-9 9-4 1 1-4 9-9z"
+                  stroke="rgba(98,246,255,.85)"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
           </div>
         </div>
+      </div>
 
-        <div class="controls" aria-label="Управление">
-          <button class="btn btn--small" id="minusBtn" type="button" aria-label="Убавить стакан">
-            <!-- minus icon -->
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M6.5 12H17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
+      <div class="bottom" aria-label="Навигация">
+        <button
+          class="navbtn"
+          id="settingsBtn"
+          type="button"
+          aria-label="Настройки"
+        >
+          <!-- gear icon -->
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
+              stroke="rgba(232,251,255,.88)"
+              stroke-width="1.6"
+            />
+            <path
+              d="M19.2 12a7.2 7.2 0 0 0-.08-1l2-1.44-1.8-3.12-2.36.82a7.2 7.2 0 0 0-1.72-1l-.36-2.48H10.2l-.36 2.48a7.2 7.2 0 0 0-1.72 1l-2.36-.82-1.8 3.12 2 1.44a7.2 7.2 0 0 0 0 2l-2 1.44 1.8 3.12 2.36-.82c.54.4 1.12.74 1.72 1l.36 2.48h3.6l.36-2.48c.6-.26 1.18-.6 1.72-1l2.36.82 1.8-3.12-2-1.44c.05-.33.08-.66.08-1Z"
+              stroke="rgba(98,246,255,.55)"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+
+        <div class="safe" aria-hidden="true"></div>
+
+        <button
+          class="navbtn"
+          id="statsBtn"
+          type="button"
+          aria-label="Статистика"
+        >
+          <!-- chart icon -->
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M5.5 18.5V5.5"
+              stroke="rgba(232,251,255,.55)"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+            <path
+              d="M5.5 18.5H18.5"
+              stroke="rgba(232,251,255,.55)"
+              stroke-width="1.6"
+              stroke-linecap="round"
+            />
+            <path
+              d="M8.2 15.2l3-3 2.2 2.2 4.2-5"
+              stroke="rgba(98,246,255,.85)"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M8.2 15.2h0"
+              stroke="rgba(98,246,255,.85)"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+            <path
+              d="M11.2 12.2h0"
+              stroke="rgba(98,246,255,.85)"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+            <path
+              d="M13.4 14.4h0"
+              stroke="rgba(98,246,255,.85)"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+            <path
+              d="M17.6 9.4h0"
+              stroke="rgba(98,246,255,.85)"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div
+      class="modal"
+      id="settingsModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settingsTitle"
+    >
+      <div class="sheet" role="document">
+        <div class="sheet__head">
+          <div class="sheet__title" id="settingsTitle">
+            <!-- sliders icon -->
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 7h10"
+                stroke="rgba(98,246,255,.85)"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <path
+                d="M18 7h2"
+                stroke="rgba(232,251,255,.72)"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <path
+                d="M4 17h2"
+                stroke="rgba(232,251,255,.72)"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <path
+                d="M10 17h10"
+                stroke="rgba(98,246,255,.85)"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <path
+                d="M14 7a2 2 0 1 0 0 .01"
+                stroke="rgba(98,246,255,.40)"
+                stroke-width="1.6"
+                fill="none"
+              />
+              <path
+                d="M8 17a2 2 0 1 0 0 .01"
+                stroke="rgba(98,246,255,.40)"
+                stroke-width="1.6"
+                fill="none"
+              />
+            </svg>
+            Настройки
+          </div>
+
+          <button
+            class="close"
+            id="settingsClose"
+            type="button"
+            aria-label="Закрыть настройки"
+          >
+            <!-- X icon -->
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M7 7l10 10"
+                stroke="rgba(232,251,255,.85)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M17 7L7 17"
+                stroke="rgba(232,251,255,.85)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
             </svg>
           </button>
+        </div>
 
-          <button class="btn btn--big" id="plusBtn" type="button" aria-label="Добавить стакан">
+        <div class="sheet__body">
+          <div class="row">
+            <div class="field">
+              <div class="label">
+                <span>Вес (кг)</span>
+                <small>цель = вес × 35 мл</small>
+              </div>
+              <input
+                class="input"
+                id="weightInput"
+                type="number"
+                inputmode="decimal"
+                min="20"
+                max="250"
+                step="0.1"
+              />
+            </div>
+
+            <div class="field">
+              <div class="label">
+                <span>Объём стакана (мл)</span>
+                <small>по умолчанию 250</small>
+              </div>
+              <input
+                class="input"
+                id="glassInput"
+                type="number"
+                inputmode="numeric"
+                min="50"
+                max="2000"
+                step="10"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label">
+              <span>Ручная цель (мл)</span>
+              <small>перезапишет расчёт по весу</small>
+            </div>
+            <input
+              class="input"
+              id="customGoalInput"
+              type="number"
+              inputmode="numeric"
+              min="500"
+              max="10000"
+              step="100"
+            />
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="field">
+            <div class="label">
+              <span>Текущая цель</span>
+              <small id="settingsGoal">0 мл/день</small>
+            </div>
+            <div
+              style="
+                color: rgba(232, 251, 255, 0.62);
+                font-size: 13px;
+                line-height: 1.45;
+              "
+            >
+              Данные сохраняются локально (LocalStorage). При смене дня счётчик
+              «сегодня» сбрасывается, а результат за вчера автоматически
+              попадает в историю. Статистика хранится до 30 дней.
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btnline" id="settingsCancel" type="button">
+              Отмена
+            </button>
+            <button class="btn btnline primary" id="settingsSave" type="button">
+              Сохранить
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div
+      class="modal"
+      id="statsModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="statsTitle"
+    >
+      <div class="sheet" role="document">
+        <div class="sheet__head">
+          <div class="sheet__title" id="statsTitle">
+            <!-- histogram icon -->
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M6 19V10"
+                stroke="rgba(98,246,255,.85)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M12 19V6"
+                stroke="rgba(232,251,255,.78)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M18 19v-8"
+                stroke="rgba(98,246,255,.55)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M5 19h14"
+                stroke="rgba(232,251,255,.48)"
+                stroke-width="1.6"
+                stroke-linecap="round"
+              />
+            </svg>
+            Статистика (до 30 дней)
+          </div>
+
+          <button
+            class="close"
+            id="statsClose"
+            type="button"
+            aria-label="Закрыть статистику"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M7 7l10 10"
+                stroke="rgba(232,251,255,.85)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M17 7L7 17"
+                stroke="rgba(232,251,255,.85)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <div class="sheet__body">
+          <div class="stats" id="statsList"></div>
+
+          <div class="divider"></div>
+
+          <div class="field">
+            <div class="label">
+              <span>Сводка</span>
+              <small id="statsSummary">—</small>
+            </div>
+          </div>
+
+          <div class="actions" style="justify-content: space-between">
+            <button class="btn btnline danger" id="resetToday" type="button">
+              Сбросить за сегодня
+            </button>
+            <button class="btn btnline danger" id="resetAll" type="button">
+              Сбросить всё
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Add Modal -->
+    <div
+      class="modal"
+      id="customModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="customTitle"
+    >
+      <div class="sheet" role="document">
+        <div class="sheet__head">
+          <div class="sheet__title" id="customTitle">
             <!-- plus icon -->
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 6.5V17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
-              <path d="M6.5 12H17.5" stroke="rgba(232,251,255,.92)" stroke-width="2" stroke-linecap="round"/>
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 6.5V17.5"
+                stroke="rgba(98,246,255,.85)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M6.5 12H17.5"
+                stroke="rgba(98,246,255,.85)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+            Добавить воду
+          </div>
+
+          <button
+            class="close"
+            id="customClose"
+            type="button"
+            aria-label="Закрыть"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M7 7l10 10"
+                stroke="rgba(232,251,255,.85)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M17 7L7 17"
+                stroke="rgba(232,251,255,.85)"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
             </svg>
           </button>
         </div>
-      </div>
-    </div>
 
-    <div class="bottom" aria-label="Навигация">
-      <button class="navbtn" id="settingsBtn" type="button" aria-label="Настройки">
-        <!-- gear icon -->
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
-                stroke="rgba(232,251,255,.88)" stroke-width="1.6"/>
-          <path d="M19.2 12a7.2 7.2 0 0 0-.08-1l2-1.44-1.8-3.12-2.36.82a7.2 7.2 0 0 0-1.72-1l-.36-2.48H10.2l-.36 2.48a7.2 7.2 0 0 0-1.72 1l-2.36-.82-1.8 3.12 2 1.44a7.2 7.2 0 0 0 0 2l-2 1.44 1.8 3.12 2.36-.82c.54.4 1.12.74 1.72 1l.36 2.48h3.6l.36-2.48c.6-.26 1.18-.6 1.72-1l2.36.82 1.8-3.12-2-1.44c.05-.33.08-.66.08-1Z"
-                stroke="rgba(98,246,255,.55)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-
-      <div class="safe" aria-hidden="true"></div>
-
-      <button class="navbtn" id="statsBtn" type="button" aria-label="Статистика">
-        <!-- chart icon -->
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M5.5 18.5V5.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M5.5 18.5H18.5" stroke="rgba(232,251,255,.55)" stroke-width="1.6" stroke-linecap="round"/>
-          <path d="M8.2 15.2l3-3 2.2 2.2 4.2-5"
-                stroke="rgba(98,246,255,.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M8.2 15.2h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
-          <path d="M11.2 12.2h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
-          <path d="M13.4 14.4h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
-          <path d="M17.6 9.4h0" stroke="rgba(98,246,255,.85)" stroke-width="4" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- Settings Modal -->
-  <div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-    <div class="sheet" role="document">
-      <div class="sheet__head">
-        <div class="sheet__title" id="settingsTitle">
-          <!-- sliders icon -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 7h10" stroke="rgba(98,246,255,.85)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M18 7h2" stroke="rgba(232,251,255,.72)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M4 17h2" stroke="rgba(232,251,255,.72)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M10 17h10" stroke="rgba(98,246,255,.85)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M14 7a2 2 0 1 0 0 .01" stroke="rgba(98,246,255,.40)" stroke-width="1.6" fill="none"/>
-            <path d="M8 17a2 2 0 1 0 0 .01" stroke="rgba(98,246,255,.40)" stroke-width="1.6" fill="none"/>
-          </svg>
-          Настройки
-        </div>
-
-        <button class="close" id="settingsClose" type="button" aria-label="Закрыть настройки">
-          <!-- X icon -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 7l10 10" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M17 7L7 17" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="sheet__body">
-        <div class="row">
-          <div class="field">
-            <div class="label">
-              <span>Вес (кг)</span>
-              <small>цель = вес × 35 мл</small>
+        <div class="sheet__body">
+          <div class="custom-add">
+            <div class="field">
+              <div class="label">
+                <span>Количество (мл)</span>
+                <small>минимум 50 мл</small>
+              </div>
+              <input
+                class="input"
+                id="customMlInput"
+                type="number"
+                inputmode="numeric"
+                min="50"
+                step="10"
+                placeholder="Введите мл"
+              />
             </div>
-            <input class="input" id="weightInput" type="number" inputmode="decimal" min="20" max="250" step="0.1" />
           </div>
 
-          <div class="field">
-            <div class="label">
-              <span>Объём стакана (мл)</span>
-              <small>по умолчанию 250</small>
-            </div>
-            <input class="input" id="glassInput" type="number" inputmode="numeric" min="50" max="2000" step="10" />
+          <div class="actions">
+            <button class="btn btnline" id="customCancel" type="button">
+              Отмена
+            </button>
+            <button class="btn btnline primary" id="customSave" type="button">
+              Добавить
+            </button>
           </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="field">
-          <div class="label">
-            <span>Текущая цель</span>
-            <small id="settingsGoal">0 мл/день</small>
-          </div>
-          <div style="color: rgba(232,251,255,.62); font-size: 13px; line-height: 1.45;">
-            Данные сохраняются локально (LocalStorage). При смене дня счётчик «сегодня» сбрасывается,
-            а результат за вчера автоматически попадает в историю.
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btnline" id="settingsCancel" type="button">Отмена</button>
-          <button class="btn btnline primary" id="settingsSave" type="button">Сохранить</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Stats Modal -->
-  <div class="modal" id="statsModal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
-    <div class="sheet" role="document">
-      <div class="sheet__head">
-        <div class="sheet__title" id="statsTitle">
-          <!-- histogram icon -->
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M6 19V10" stroke="rgba(98,246,255,.85)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M12 19V6" stroke="rgba(232,251,255,.78)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M18 19v-8" stroke="rgba(98,246,255,.55)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M5 19h14" stroke="rgba(232,251,255,.48)" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-          Статистика (7 дней)
-        </div>
+    <script>
+      (() => {
+        "use strict";
 
-        <button class="close" id="statsClose" type="button" aria-label="Закрыть статистику">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 7l10 10" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-            <path d="M17 7L7 17" stroke="rgba(232,251,255,.85)" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
+        const STORAGE_KEY = "water_tracker_deep_ocean_v2"; // Updated version for compatibility
+        const OLD_STORAGE_KEY = "water_tracker_deep_ocean_v1";
 
-      <div class="sheet__body">
-        <div class="stats" id="statsList"></div>
+        const $ = (sel, root = document) => root.querySelector(sel);
 
-        <div class="divider"></div>
+        const els = {
+          percent: $("#percent"),
+          amount: $("#amount"),
+          goalNote: $("#goalNote"),
+          hintText: $("#hintText"),
+          streakInfo: $("#streakInfo"),
 
-        <div class="field">
-          <div class="label">
-            <span>Сводка</span>
-            <small id="statsSummary">—</small>
-          </div>
-        </div>
+          plusBtn: $("#plusBtn"),
+          minusBtn: $("#minusBtn"),
+          customBtn: $("#customBtn"),
 
-        <div class="actions" style="justify-content: space-between;">
-          <button class="btn btnline danger" id="resetToday" type="button">Сбросить за сегодня</button>
-          <button class="btn btnline danger" id="resetAll" type="button">Сбросить статистику полностью</button>
-        </div>
-      </div>
-    </div>
-  </div>
+          settingsBtn: $("#settingsBtn"),
+          statsBtn: $("#statsBtn"),
 
-  <script>
-    (() => {
-      "use strict";
+          settingsModal: $("#settingsModal"),
+          statsModal: $("#statsModal"),
+          customModal: $("#customModal"),
 
-      const STORAGE_KEY = "water_tracker_deep_ocean_v1";
+          settingsClose: $("#settingsClose"),
+          statsClose: $("#statsClose"),
+          customClose: $("#customClose"),
+          settingsCancel: $("#settingsCancel"),
+          settingsSave: $("#settingsSave"),
+          customCancel: $("#customCancel"),
+          customSave: $("#customSave"),
 
-      const $ = (sel, root=document) => root.querySelector(sel);
+          weightInput: $("#weightInput"),
+          glassInput: $("#glassInput"),
+          customGoalInput: $("#customGoalInput"),
+          settingsGoal: $("#settingsGoal"),
 
-      const els = {
-        percent: $("#percent"),
-        amount: $("#amount"),
-        goalNote: $("#goalNote"),
-        hintText: $("#hintText"),
+          statsList: $("#statsList"),
+          statsSummary: $("#statsSummary"),
 
-        plusBtn: $("#plusBtn"),
-        minusBtn: $("#minusBtn"),
+          resetToday: $("#resetToday"),
+          resetAll: $("#resetAll"),
 
-        settingsBtn: $("#settingsBtn"),
-        statsBtn: $("#statsBtn"),
+          customMlInput: $("#customMlInput"),
+        };
 
-        settingsModal: $("#settingsModal"),
-        statsModal: $("#statsModal"),
+        const pad2 = (n) => String(n).padStart(2, "0");
+        const toISODateLocal = (d) =>
+          `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 
-        settingsClose: $("#settingsClose"),
-        statsClose: $("#statsClose"),
-        settingsCancel: $("#settingsCancel"),
-        settingsSave: $("#settingsSave"),
+        const addDays = (isoDate, delta) => {
+          const [y, m, day] = isoDate.split("-").map(Number);
+          const d = new Date(y, m - 1, day);
+          d.setDate(d.getDate() + delta);
+          return toISODateLocal(d);
+        };
 
-        weightInput: $("#weightInput"),
-        glassInput: $("#glassInput"),
-        settingsGoal: $("#settingsGoal"),
+        const daysBetween = (date1, date2) => {
+          const [y1, m1, d1] = date1.split("-").map(Number);
+          const [y2, m2, d2] = date2.split("-").map(Number);
+          const dt1 = new Date(y1, m1 - 1, d1);
+          const dt2 = new Date(y2, m2 - 1, d2);
+          return Math.round((dt2 - dt1) / (1000 * 60 * 60 * 24)) + 1; // inclusive
+        };
 
-        statsList: $("#statsList"),
-        statsSummary: $("#statsSummary"),
+        const weekdayShort = (isoDate) => {
+          const [y, m, day] = isoDate.split("-").map(Number);
+          const d = new Date(y, m - 1, day);
+          return d
+            .toLocaleDateString("ru-RU", { weekday: "short" })
+            .replace(".", "");
+        };
 
-        resetToday: $("#resetToday"),
-        resetAll: $("#resetAll")
-      };
+        const prettyDate = (isoDate) => {
+          const [y, m, day] = isoDate.split("-").map(Number);
+          const d = new Date(y, m - 1, day);
+          return d.toLocaleDateString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
+          });
+        };
 
-      const pad2 = (n) => String(n).padStart(2, "0");
-      const toISODateLocal = (d) => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+        const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
-      const addDays = (isoDate, delta) => {
-        const [y,m,day] = isoDate.split("-").map(Number);
-        const d = new Date(y, m-1, day);
-        d.setDate(d.getDate() + delta);
-        return toISODateLocal(d);
-      };
+        const calcGoalMl = (weightKg, customGoal = 0) => {
+          if (customGoal > 0) return customGoal;
+          const w = Number(weightKg);
+          if (!Number.isFinite(w) || w <= 0) return 0;
+          return Math.round(w * 35);
+        };
 
-      const weekdayShort = (isoDate) => {
-        const [y,m,day] = isoDate.split("-").map(Number);
-        const d = new Date(y, m-1, day);
-        return d.toLocaleDateString("ru-RU", { weekday: "short" }).replace(".", "");
-      };
+        const defaults = () => ({
+          firstDate: toISODateLocal(new Date()),
+          weightKg: 70,
+          glassMl: 250,
+          customGoal: 0,
+          todayMl: 0,
+          lastDate: toISODateLocal(new Date()),
+          history: [], // [{date:'YYYY-MM-DD', ml:number, goalMl:number}]
+        });
 
-      const prettyDate = (isoDate) => {
-        const [y,m,day] = isoDate.split("-").map(Number);
-        const d = new Date(y, m-1, day);
-        return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
-      };
-
-      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-
-      const calcGoalMl = (weightKg) => {
-        const w = Number(weightKg);
-        if (!Number.isFinite(w) || w <= 0) return 0;
-        return Math.round(w * 35);
-      };
-
-      const defaults = () => ({
-        weightKg: 70,
-        glassMl: 250,
-        todayMl: 0,
-        lastDate: toISODateLocal(new Date()),
-        history: [] // [{date:'YYYY-MM-DD', ml:number, goalMl:number}]
-      });
-
-      const load = () => {
-        try{
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return defaults();
-          const parsed = JSON.parse(raw);
-
-          const d = defaults();
-          const safe = {
-            weightKg: Number.isFinite(+parsed.weightKg) ? +parsed.weightKg : d.weightKg,
-            glassMl: Number.isFinite(+parsed.glassMl) ? Math.round(+parsed.glassMl) : d.glassMl,
-            todayMl: Number.isFinite(+parsed.todayMl) ? Math.round(+parsed.todayMl) : d.todayMl,
-            lastDate: typeof parsed.lastDate === "string" ? parsed.lastDate : d.lastDate,
-            history: Array.isArray(parsed.history) ? parsed.history : d.history
-          };
-
-          // sanitize
-          safe.weightKg = clamp(safe.weightKg, 20, 250);
-          safe.glassMl = clamp(safe.glassMl, 50, 2000);
-          safe.todayMl = Math.max(0, safe.todayMl);
-
-          safe.history = safe.history
-            .filter(x => x && typeof x.date === "string")
-            .map(x => ({
-              date: x.date,
-              ml: Math.max(0, Math.round(+x.ml || 0)),
-              goalMl: Math.max(0, Math.round(+x.goalMl || 0))
-            }));
-
-          return safe;
-        } catch {
-          return defaults();
-        }
-      };
-
-      const save = () => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      };
-
-      const dedupeHistoryByDate = (arr) => {
-        const map = new Map();
-        for (const item of arr) map.set(item.date, item);
-        return Array.from(map.values()).sort((a,b) => a.date.localeCompare(b.date));
-      };
-
-      const ensureDayRollover = () => {
-        const today = toISODateLocal(new Date());
-        if (state.lastDate !== today) {
-          // push yesterday (or last known date) into history
-          if (state.lastDate) {
-            const goal = calcGoalMl(state.weightKg);
-            const entry = { date: state.lastDate, ml: state.todayMl, goalMl: goal };
-            state.history = dedupeHistoryByDate([...(state.history || []), entry]);
-
-            // keep only last 7 days in storage (excluding today)
-            state.history = state.history.slice(-7);
+        const load = () => {
+          // Migration from v1
+          if (!localStorage.getItem(STORAGE_KEY)) {
+            const oldRaw = localStorage.getItem(OLD_STORAGE_KEY);
+            if (oldRaw) {
+              try {
+                const oldParsed = JSON.parse(oldRaw);
+                const migrated = {
+                  ...defaults(),
+                  weightKg: oldParsed.weightKg || defaults().weightKg,
+                  glassMl: oldParsed.glassMl || defaults().glassMl,
+                  todayMl: oldParsed.todayMl || defaults().todayMl,
+                  lastDate: oldParsed.lastDate || defaults().lastDate,
+                  history: oldParsed.history || defaults().history,
+                };
+                // Set firstDate based on history or lastDate
+                if (migrated.history.length > 0) {
+                  migrated.history.sort((a, b) => a.date.localeCompare(b.date));
+                  migrated.firstDate = migrated.history[0].date;
+                } else {
+                  migrated.firstDate = migrated.lastDate;
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+              } catch {
+                // If migration fails, use defaults
+              }
+            }
           }
 
-          state.todayMl = 0;
-          state.lastDate = today;
-          save();
-        }
-      };
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return defaults();
+            const parsed = JSON.parse(raw);
 
-      const haptic = (pattern=10) => {
-        if (navigator.vibrate) navigator.vibrate(pattern);
-      };
+            const d = defaults();
+            const safe = {
+              firstDate:
+                typeof parsed.firstDate === "string"
+                  ? parsed.firstDate
+                  : d.firstDate,
+              weightKg: Number.isFinite(+parsed.weightKg)
+                ? +parsed.weightKg
+                : d.weightKg,
+              glassMl: Number.isFinite(+parsed.glassMl)
+                ? Math.round(+parsed.glassMl)
+                : d.glassMl,
+              customGoal: Number.isFinite(+parsed.customGoal)
+                ? Math.round(+parsed.customGoal)
+                : d.customGoal,
+              todayMl: Number.isFinite(+parsed.todayMl)
+                ? Math.round(+parsed.todayMl)
+                : d.todayMl,
+              lastDate:
+                typeof parsed.lastDate === "string"
+                  ? parsed.lastDate
+                  : d.lastDate,
+              history: Array.isArray(parsed.history)
+                ? parsed.history
+                : d.history,
+            };
 
-      const setProgress = (percentVisual) => {
-        document.documentElement.style.setProperty("--p", String(percentVisual));
-      };
+            // sanitize
+            safe.weightKg = clamp(safe.weightKg, 20, 250);
+            safe.glassMl = clamp(safe.glassMl, 50, 2000);
+            safe.customGoal = clamp(safe.customGoal, 0, 10000);
+            safe.todayMl = Math.max(0, safe.todayMl);
 
-      const render = () => {
-        ensureDayRollover();
+            safe.history = safe.history
+              .filter((x) => x && typeof x.date === "string")
+              .map((x) => ({
+                date: x.date,
+                ml: Math.max(0, Math.round(+x.ml || 0)),
+                goalMl: Math.max(0, Math.round(+x.goalMl || 0)),
+              }));
 
-        const goal = calcGoalMl(state.weightKg);
-        const current = state.todayMl;
-
-        const rawPercent = goal > 0 ? Math.round((current / goal) * 100) : 0;
-        const shownPercent = Number.isFinite(rawPercent) ? rawPercent : 0;
-        const visualPercent = clamp(shownPercent, 0, 100);
-
-        setProgress(visualPercent);
-
-        els.percent.textContent = `${shownPercent}%`;
-        els.amount.textContent = `${current} / ${goal} ml`;
-        els.goalNote.textContent = `Цель: ${goal} ml • Стакан: ${state.glassMl} ml`;
-
-        // subtle hint dynamics
-        if (current === 0) els.hintText.textContent = "+ добавляет стакан";
-        else if (shownPercent >= 100) els.hintText.textContent = "Цель достигнута. Можно + по желанию";
-        else els.hintText.textContent = "Держи ритм. + / - корректируют";
-
-        // settings modal values (if open too)
-        els.settingsGoal.textContent = `${goal} мл/день`;
-      };
-
-      const openModal = (modalEl) => {
-        modalEl.classList.add("is-open");
-        // lock "scroll" (even though we don't scroll)
-        document.body.style.overflow = "hidden";
-      };
-
-      const closeModal = (modalEl) => {
-        modalEl.classList.remove("is-open");
-        document.body.style.overflow = "hidden";
-      };
-
-      const isOpen = (modalEl) => modalEl.classList.contains("is-open");
-
-      const onOverlayClickToClose = (modalEl, ev) => {
-        if (ev.target === modalEl) closeModal(modalEl);
-      };
-
-      const formatMl = (n) => `${Math.round(n)} ml`;
-
-      const build7Days = () => {
-        const today = toISODateLocal(new Date());
-        const goalToday = calcGoalMl(state.weightKg);
-
-        const map = new Map((state.history || []).map(x => [x.date, x]));
-        const days = [];
-
-        for (let i = 6; i >= 0; i--) {
-          const date = addDays(today, -i);
-          if (date === today) {
-            days.push({
-              date,
-              ml: state.todayMl,
-              goalMl: goalToday,
-              isToday: true
-            });
-          } else {
-            const entry = map.get(date);
-            days.push({
-              date,
-              ml: entry ? entry.ml : 0,
-              goalMl: entry ? (entry.goalMl || goalToday) : goalToday,
-              isToday: false
-            });
+            return safe;
+          } catch {
+            return defaults();
           }
-        }
-        return days;
-      };
+        };
 
-      const renderStats = () => {
-        ensureDayRollover();
+        const save = () => {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        };
 
-        const days = build7Days();
-        els.statsList.innerHTML = "";
+        const dedupeHistoryByDate = (arr) => {
+          const map = new Map();
+          for (const item of arr) map.set(item.date, item);
+          return Array.from(map.values()).sort((a, b) =>
+            a.date.localeCompare(b.date)
+          );
+        };
 
-        let total = 0;
-        let hits = 0;
+        const ensureDayRollover = () => {
+          const today = toISODateLocal(new Date());
+          if (state.lastDate !== today) {
+            // push yesterday into history
+            if (state.lastDate) {
+              const goal = calcGoalMl(state.weightKg, state.customGoal);
+              const entry = {
+                date: state.lastDate,
+                ml: state.todayMl,
+                goalMl: goal,
+              };
+              state.history = dedupeHistoryByDate([
+                ...(state.history || []),
+                entry,
+              ]);
 
-        for (const d of days) {
-          const pct = d.goalMl > 0 ? Math.round((d.ml / d.goalMl) * 100) : 0;
-          const w = clamp(pct, 0, 100);
+              // keep last 30 days
+              state.history = state.history.slice(-30);
+            }
 
-          total += d.ml;
-          if (pct >= 100) hits++;
+            state.todayMl = 0;
+            state.lastDate = today;
+            save();
+          }
+        };
 
-          const row = document.createElement("div");
-          row.className = "statrow";
-          row.innerHTML = `
+        const haptic = (pattern = 10) => {
+          if (navigator.vibrate) navigator.vibrate(pattern);
+        };
+
+        const setProgress = (percentVisual) => {
+          document.documentElement.style.setProperty(
+            "--p",
+            String(percentVisual)
+          );
+        };
+
+        const render = () => {
+          ensureDayRollover();
+
+          const goal = calcGoalMl(state.weightKg, state.customGoal);
+          const current = state.todayMl;
+
+          const rawPercent = goal > 0 ? Math.round((current / goal) * 100) : 0;
+          const shownPercent = Number.isFinite(rawPercent) ? rawPercent : 0;
+          const visualPercent = clamp(shownPercent, 0, 100);
+
+          setProgress(visualPercent);
+
+          els.percent.textContent = `${shownPercent}%`;
+          els.amount.textContent = `${current} / ${goal} ml`;
+          els.goalNote.textContent = `Цель: ${goal} ml • Стакан: ${state.glassMl} ml`;
+
+          // hint dynamics
+          if (current === 0)
+            els.hintText.textContent =
+              "+ добавляет стакан, или укажите вручную";
+          else if (shownPercent >= 100)
+            els.hintText.textContent = "Цель достигнута! Можно + по желанию";
+          else
+            els.hintText.textContent = "+ / - стакан, или кастомное количество";
+
+          // streak and total days on main screen
+          const { currentStreak, maxStreak } = calculateStreaks();
+          const totalDays = daysBetween(state.firstDate, state.lastDate);
+          els.streakInfo.textContent = `Серия: ${currentStreak} дней (макс: ${maxStreak}) • Всего дней: ${totalDays}`;
+
+          // settings modal values
+          els.settingsGoal.textContent = `${goal} мл/день`;
+        };
+
+        const openModal = (modalEl) => {
+          modalEl.classList.add("is-open");
+          document.body.style.overflow = "hidden";
+        };
+
+        const closeModal = (modalEl) => {
+          modalEl.classList.remove("is-open");
+          document.body.style.overflow = "";
+        };
+
+        const isOpen = (modalEl) => modalEl.classList.contains("is-open");
+
+        const onOverlayClickToClose = (modalEl, ev) => {
+          if (ev.target === modalEl) closeModal(modalEl);
+        };
+
+        const formatMl = (n) => `${Math.round(n)} ml`;
+
+        const buildHistory = (maxDays = 30) => {
+          const today = toISODateLocal(new Date());
+          const goalToday = calcGoalMl(state.weightKg, state.customGoal);
+
+          const map = new Map((state.history || []).map((x) => [x.date, x]));
+          const days = [];
+
+          for (let i = maxDays - 1; i >= 0; i--) {
+            const date = addDays(today, -i);
+            if (date === today) {
+              days.push({
+                date,
+                ml: state.todayMl,
+                goalMl: goalToday,
+                isToday: true,
+              });
+            } else {
+              const entry = map.get(date);
+              days.push({
+                date,
+                ml: entry ? entry.ml : 0,
+                goalMl: entry ? entry.goalMl || goalToday : goalToday,
+                isToday: false,
+              });
+            }
+          }
+          return days;
+        };
+
+        const calculateStreaks = () => {
+          const days = buildHistory().reverse(); // from oldest to newest
+          let currentStreak = 0;
+          let maxStreak = 0;
+          let tempStreak = 0;
+
+          for (const d of days) {
+            const pct = d.goalMl > 0 ? (d.ml / d.goalMl) * 100 : 0;
+            if (pct >= 100) {
+              tempStreak++;
+              if (d.isToday) currentStreak = tempStreak; // only count current if today is achieved
+            } else {
+              maxStreak = Math.max(maxStreak, tempStreak);
+              tempStreak = 0;
+            }
+          }
+          maxStreak = Math.max(maxStreak, tempStreak);
+
+          if (days[days.length - 1].isToday) {
+            const todayPct =
+              days[days.length - 1].goalMl > 0
+                ? (days[days.length - 1].ml / days[days.length - 1].goalMl) *
+                  100
+                : 0;
+            if (todayPct < 100) currentStreak = 0; // reset current if today not achieved
+          }
+
+          return { currentStreak, maxStreak };
+        };
+
+        const renderStats = () => {
+          ensureDayRollover();
+
+          const days = buildHistory();
+          els.statsList.innerHTML = "";
+
+          let total = 0;
+          let hits = 0;
+          let totalDaysWithData = 0;
+
+          for (const d of days) {
+            const pct = d.goalMl > 0 ? Math.round((d.ml / d.goalMl) * 100) : 0;
+            const w = clamp(pct, 0, 100);
+
+            total += d.ml;
+            if (d.ml > 0) totalDaysWithData++;
+            if (pct >= 100) hits++;
+
+            const row = document.createElement("div");
+            row.className = "statrow";
+            row.innerHTML = `
             <div class="date">
               ${d.isToday ? "сегодня" : weekdayShort(d.date)}
               <b>${prettyDate(d.date)}</b>
@@ -1092,190 +1829,267 @@
               </div>
             </div>
           `;
-          els.statsList.appendChild(row);
-        }
-
-        const avg = Math.round(total / 7);
-        els.statsSummary.textContent = `Итого: ${total} ml • Среднее: ${avg} ml/день • Дней 100%: ${hits}/7`;
-      };
-
-      // ===== State =====
-      let state = load();
-      ensureDayRollover();
-      save();
-      render();
-
-      // ===== Main actions =====
-      const addGlass = () => {
-        ensureDayRollover();
-        state.todayMl = Math.max(0, state.todayMl + state.glassMl);
-        save();
-        render();
-        haptic(12);
-      };
-
-      const removeGlass = () => {
-        ensureDayRollover();
-        state.todayMl = Math.max(0, state.todayMl - state.glassMl);
-        save();
-        render();
-        haptic(8);
-      };
-
-      els.plusBtn.addEventListener("click", addGlass);
-      els.minusBtn.addEventListener("click", removeGlass);
-
-      // ===== Settings =====
-      let draftSettings = null;
-
-      const openSettings = () => {
-        ensureDayRollover();
-        draftSettings = { weightKg: state.weightKg, glassMl: state.glassMl };
-        els.weightInput.value = String(draftSettings.weightKg);
-        els.glassInput.value = String(draftSettings.glassMl);
-
-        els.settingsGoal.textContent = `${calcGoalMl(draftSettings.weightKg)} мл/день`;
-
-        openModal(els.settingsModal);
-      };
-
-      const closeSettings = () => {
-        draftSettings = null;
-        closeModal(els.settingsModal);
-      };
-
-      const saveSettings = () => {
-        const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
-        const g = clamp(Math.round(parseFloat(els.glassInput.value || "0")), 50, 2000);
-
-        state.weightKg = Number.isFinite(w) ? w : state.weightKg;
-        state.glassMl  = Number.isFinite(g) ? g : state.glassMl;
-
-        save();
-        render();
-        closeSettings();
-        haptic([8, 18, 8]);
-      };
-
-      els.settingsBtn.addEventListener("click", openSettings);
-      els.settingsClose.addEventListener("click", closeSettings);
-      els.settingsCancel.addEventListener("click", closeSettings);
-      els.settingsSave.addEventListener("click", saveSettings);
-      els.settingsModal.addEventListener("click", (ev) => onOverlayClickToClose(els.settingsModal, ev));
-
-      const updateDraftGoal = () => {
-        const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
-        els.settingsGoal.textContent = `${calcGoalMl(w)} мл/день`;
-      };
-
-      els.weightInput.addEventListener("input", updateDraftGoal);
-
-      // ===== Stats =====
-      const openStats = () => {
-        renderStats();
-        openModal(els.statsModal);
-      };
-
-      const closeStats = () => closeModal(els.statsModal);
-
-      els.statsBtn.addEventListener("click", openStats);
-      els.statsClose.addEventListener("click", closeStats);
-      els.statsModal.addEventListener("click", (ev) => onOverlayClickToClose(els.statsModal, ev));
-
-      // Reset today
-      els.resetToday.addEventListener("click", () => {
-        ensureDayRollover();
-        const ok = confirm("Сбросить выпитое за сегодня?");
-        if (!ok) return;
-        state.todayMl = 0;
-        save();
-        render();
-        renderStats();
-        haptic([10, 40, 10]);
-      });
-
-      // Reset all
-      els.resetAll.addEventListener("click", () => {
-        const ok = confirm("Сбросить всю статистику полностью? Это удалит историю и значения.");
-        if (!ok) return;
-        const d = defaults();
-        state = d;
-        save();
-        render();
-        renderStats();
-        haptic([12, 30, 12, 30, 12]);
-      });
-
-      // ===== Keyboard (Esc) =====
-      window.addEventListener("keydown", (ev) => {
-        if (ev.key === "Escape") {
-          if (isOpen(els.statsModal)) closeStats();
-          if (isOpen(els.settingsModal)) closeSettings();
-        }
-      });
-
-      // ===== Parallax / Depth (mouse + deviceorientation) =====
-      const setParallax = (nx, ny) => {
-        // nx, ny in [-1..1]
-        const px = clamp(nx, -1, 1) * 10;  // px
-        const py = clamp(ny, -1, 1) * 10;
-        document.documentElement.style.setProperty("--parx", `${px}px`);
-        document.documentElement.style.setProperty("--pary", `${py}px`);
-        document.documentElement.style.setProperty("--tilt", `${(-nx * 0.6).toFixed(2)}deg`);
-      };
-
-      // mouse (desktop)
-      window.addEventListener("mousemove", (ev) => {
-        const w = window.innerWidth || 1;
-        const h = window.innerHeight || 1;
-        const nx = (ev.clientX / w) * 2 - 1;
-        const ny = (ev.clientY / h) * 2 - 1;
-        setParallax(nx, ny);
-      }, { passive: true });
-
-      // device orientation (mobile)
-      const attachDeviceOrientation = () => {
-        window.addEventListener("deviceorientation", (ev) => {
-          // gamma: left-right [-90..90], beta: front-back [-180..180]
-          const gamma = Number.isFinite(ev.gamma) ? ev.gamma : 0;
-          const beta  = Number.isFinite(ev.beta)  ? ev.beta  : 0;
-
-          const nx = clamp(gamma / 35, -1, 1);
-          const ny = clamp(beta / 45,  -1, 1);
-          setParallax(nx, ny);
-        }, { passive: true });
-      };
-
-      // iOS needs permission – пробуем запросить по первому “человеческому” действию
-      const maybeEnableMotion = async () => {
-        try{
-          if (typeof DeviceOrientationEvent !== "undefined" &&
-              typeof DeviceOrientationEvent.requestPermission === "function") {
-            const res = await DeviceOrientationEvent.requestPermission();
-            if (res === "granted") attachDeviceOrientation();
-          } else {
-            attachDeviceOrientation();
+            els.statsList.appendChild(row);
           }
-        } catch {
-          // silently ignore
-        }
-      };
 
-      // trigger permission request on first tap/click (iOS-friendly)
-      const once = { once: true, passive: true };
-      window.addEventListener("pointerdown", maybeEnableMotion, once);
-      window.addEventListener("touchstart", maybeEnableMotion, once);
+          const avg =
+            totalDaysWithData > 0 ? Math.round(total / totalDaysWithData) : 0;
+          const { currentStreak, maxStreak } = calculateStreaks();
+          els.statsSummary.textContent = `Итого: ${total} ml • Среднее: ${avg} ml/день • Дней 100%: ${hits} • Серия: ${currentStreak} (макс: ${maxStreak})`;
+        };
 
-      // ===== Midnight safety check (if tab stays open) =====
-      setInterval(() => {
-        const before = state.lastDate;
+        // ===== State =====
+        let state = load();
         ensureDayRollover();
-        if (state.lastDate !== before) {
+        save();
+        render();
+
+        // ===== Main actions =====
+        const addWater = (ml) => {
+          ensureDayRollover();
+          state.todayMl = Math.max(0, state.todayMl + ml);
+          save();
           render();
-          if (isOpen(els.statsModal)) renderStats();
-        }
-      }, 30_000);
-    })();
-  </script>
-</body>
+          haptic(12);
+        };
+
+        const removeGlass = () => {
+          ensureDayRollover();
+          state.todayMl = Math.max(0, state.todayMl - state.glassMl);
+          save();
+          render();
+          haptic(8);
+        };
+
+        els.plusBtn.addEventListener("click", () => addWater(state.glassMl));
+        els.minusBtn.addEventListener("click", removeGlass);
+
+        // ===== Custom Add =====
+        const openCustom = () => {
+          els.customMlInput.value = "";
+          openModal(els.customModal);
+          els.customMlInput.focus();
+        };
+
+        const closeCustom = () => closeModal(els.customModal);
+
+        const saveCustom = () => {
+          const ml = clamp(
+            Math.round(parseFloat(els.customMlInput.value || "0")),
+            50,
+            5000
+          );
+          if (Number.isFinite(ml) && ml > 0) {
+            addWater(ml);
+            closeCustom();
+          }
+        };
+
+        els.customBtn.addEventListener("click", openCustom);
+        els.customClose.addEventListener("click", closeCustom);
+        els.customCancel.addEventListener("click", closeCustom);
+        els.customSave.addEventListener("click", saveCustom);
+        els.customModal.addEventListener("click", (ev) =>
+          onOverlayClickToClose(els.customModal, ev)
+        );
+
+        // ===== Settings =====
+        let draftSettings = null;
+
+        const openSettings = () => {
+          ensureDayRollover();
+          draftSettings = {
+            weightKg: state.weightKg,
+            glassMl: state.glassMl,
+            customGoal: state.customGoal,
+          };
+          els.weightInput.value = String(draftSettings.weightKg);
+          els.glassInput.value = String(draftSettings.glassMl);
+          els.customGoalInput.value =
+            draftSettings.customGoal > 0
+              ? String(draftSettings.customGoal)
+              : "";
+
+          els.settingsGoal.textContent = `${calcGoalMl(
+            draftSettings.weightKg,
+            draftSettings.customGoal
+          )} мл/день`;
+
+          openModal(els.settingsModal);
+        };
+
+        const closeSettings = () => {
+          draftSettings = null;
+          closeModal(els.settingsModal);
+        };
+
+        const saveSettings = () => {
+          const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
+          const g = clamp(
+            Math.round(parseFloat(els.glassInput.value || "0")),
+            50,
+            2000
+          );
+          const cg = clamp(
+            Math.round(parseFloat(els.customGoalInput.value || "0")),
+            0,
+            10000
+          );
+
+          state.weightKg = Number.isFinite(w) ? w : state.weightKg;
+          state.glassMl = Number.isFinite(g) ? g : state.glassMl;
+          state.customGoal = Number.isFinite(cg) ? cg : state.customGoal;
+
+          save();
+          render();
+          closeSettings();
+          haptic([8, 18, 8]);
+        };
+
+        els.settingsBtn.addEventListener("click", openSettings);
+        els.settingsClose.addEventListener("click", closeSettings);
+        els.settingsCancel.addEventListener("click", closeSettings);
+        els.settingsSave.addEventListener("click", saveSettings);
+        els.settingsModal.addEventListener("click", (ev) =>
+          onOverlayClickToClose(els.settingsModal, ev)
+        );
+
+        const updateDraftGoal = () => {
+          const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
+          const cg = clamp(
+            Math.round(parseFloat(els.customGoalInput.value || "0")),
+            0,
+            10000
+          );
+          els.settingsGoal.textContent = `${calcGoalMl(w, cg)} мл/день`;
+        };
+
+        els.weightInput.addEventListener("input", updateDraftGoal);
+        els.customGoalInput.addEventListener("input", updateDraftGoal);
+
+        // ===== Stats =====
+        const openStats = () => {
+          renderStats();
+          openModal(els.statsModal);
+        };
+
+        const closeStats = () => closeModal(els.statsModal);
+
+        els.statsBtn.addEventListener("click", openStats);
+        els.statsClose.addEventListener("click", closeStats);
+        els.statsModal.addEventListener("click", (ev) =>
+          onOverlayClickToClose(els.statsModal, ev)
+        );
+
+        // Reset today
+        els.resetToday.addEventListener("click", () => {
+          ensureDayRollover();
+          const ok = confirm(
+            "Сбросить выпитое за сегодня? Это не удалит историю."
+          );
+          if (!ok) return;
+          state.todayMl = 0;
+          save();
+          render();
+          renderStats();
+          haptic([10, 40, 10]);
+        });
+
+        // Reset all
+        els.resetAll.addEventListener("click", () => {
+          const ok = confirm(
+            "Сбросить все данные? Это удалит историю, настройки и статистику."
+          );
+          if (!ok) return;
+          const d = defaults();
+          state = d;
+          save();
+          render();
+          renderStats();
+          haptic([12, 30, 12, 30, 12]);
+        });
+
+        // ===== Keyboard (Esc) =====
+        window.addEventListener("keydown", (ev) => {
+          if (ev.key === "Escape") {
+            if (isOpen(els.statsModal)) closeStats();
+            if (isOpen(els.settingsModal)) closeSettings();
+            if (isOpen(els.customModal)) closeCustom();
+          }
+        });
+
+        // ===== Parallax / Depth (mouse + deviceorientation) =====
+        const setParallax = (nx, ny) => {
+          const px = clamp(nx, -1, 1) * 10;
+          const py = clamp(ny, -1, 1) * 10;
+          document.documentElement.style.setProperty("--parx", `${px}px`);
+          document.documentElement.style.setProperty("--pary", `${py}px`);
+          document.documentElement.style.setProperty(
+            "--tilt",
+            `${(-nx * 0.6).toFixed(2)}deg`
+          );
+        };
+
+        // mouse (desktop)
+        window.addEventListener(
+          "mousemove",
+          (ev) => {
+            const w = window.innerWidth || 1;
+            const h = window.innerHeight || 1;
+            const nx = (ev.clientX / w) * 2 - 1;
+            const ny = (ev.clientY / h) * 2 - 1;
+            setParallax(nx, ny);
+          },
+          { passive: true }
+        );
+
+        // device orientation (mobile)
+        const attachDeviceOrientation = () => {
+          window.addEventListener(
+            "deviceorientation",
+            (ev) => {
+              const gamma = Number.isFinite(ev.gamma) ? ev.gamma : 0;
+              const beta = Number.isFinite(ev.beta) ? ev.beta : 0;
+
+              const nx = clamp(gamma / 35, -1, 1);
+              const ny = clamp(beta / 45, -1, 1);
+              setParallax(nx, ny);
+            },
+            { passive: true }
+          );
+        };
+
+        // iOS needs permission
+        const maybeEnableMotion = async () => {
+          try {
+            if (
+              typeof DeviceOrientationEvent !== "undefined" &&
+              typeof DeviceOrientationEvent.requestPermission === "function"
+            ) {
+              const res = await DeviceOrientationEvent.requestPermission();
+              if (res === "granted") attachDeviceOrientation();
+            } else {
+              attachDeviceOrientation();
+            }
+          } catch {
+            // ignore
+          }
+        };
+
+        const once = { once: true, passive: true };
+        window.addEventListener("pointerdown", maybeEnableMotion, once);
+        window.addEventListener("touchstart", maybeEnableMotion, once);
+
+        // ===== Midnight safety check =====
+        setInterval(() => {
+          const before = state.lastDate;
+          ensureDayRollover();
+          if (state.lastDate !== before) {
+            render();
+            if (isOpen(els.statsModal)) renderStats();
+          }
+        }, 30_000);
+      })();
+    </script>
+  </body>
 </html>

@@ -1451,645 +1451,676 @@
       </div>
     </div>
 
-    <script>
-      (() => {
-        "use strict";
+<script>
+  (() => {
+    "use strict";
 
-        const STORAGE_KEY = "water_tracker_deep_ocean_v2"; // Updated version for compatibility
-        const OLD_STORAGE_KEY = "water_tracker_deep_ocean_v1";
+    // ВАЖНО: ключ НЕ меняем — данные сохранятся.
+    const STORAGE_KEY = "water_tracker_deep_ocean_v2";
+    const OLD_STORAGE_KEY = "water_tracker_deep_ocean_v1";
 
-        const $ = (sel, root = document) => root.querySelector(sel);
+    const $ = (sel, root = document) => root.querySelector(sel);
 
-        const els = {
-          percent: $("#percent"),
-          amount: $("#amount"),
-          goalNote: $("#goalNote"),
-          hintText: $("#hintText"),
-          streakInfo: $("#streakInfo"),
+    const els = {
+      percent: $("#percent"),
+      amount: $("#amount"),
+      goalNote: $("#goalNote"),
+      hintText: $("#hintText"),
+      streakInfo: $("#streakInfo"),
 
-          plusBtn: $("#plusBtn"),
-          minusBtn: $("#minusBtn"),
-          customBtn: $("#customBtn"),
+      plusBtn: $("#plusBtn"),
+      minusBtn: $("#minusBtn"),
+      customBtn: $("#customBtn"),
 
-          settingsBtn: $("#settingsBtn"),
-          statsBtn: $("#statsBtn"),
+      settingsBtn: $("#settingsBtn"),
+      statsBtn: $("#statsBtn"),
 
-          settingsModal: $("#settingsModal"),
-          statsModal: $("#statsModal"),
-          customModal: $("#customModal"),
+      settingsModal: $("#settingsModal"),
+      statsModal: $("#statsModal"),
+      customModal: $("#customModal"),
 
-          settingsClose: $("#settingsClose"),
-          statsClose: $("#statsClose"),
-          customClose: $("#customClose"),
-          settingsCancel: $("#settingsCancel"),
-          settingsSave: $("#settingsSave"),
-          customCancel: $("#customCancel"),
-          customSave: $("#customSave"),
+      settingsClose: $("#settingsClose"),
+      statsClose: $("#statsClose"),
+      customClose: $("#customClose"),
+      settingsCancel: $("#settingsCancel"),
+      settingsSave: $("#settingsSave"),
+      customCancel: $("#customCancel"),
+      customSave: $("#customSave"),
 
-          weightInput: $("#weightInput"),
-          glassInput: $("#glassInput"),
-          customGoalInput: $("#customGoalInput"),
-          settingsGoal: $("#settingsGoal"),
+      weightInput: $("#weightInput"),
+      glassInput: $("#glassInput"),
+      customGoalInput: $("#customGoalInput"),
+      settingsGoal: $("#settingsGoal"),
 
-          statsList: $("#statsList"),
-          statsSummary: $("#statsSummary"),
+      statsList: $("#statsList"),
+      statsSummary: $("#statsSummary"),
 
-          resetToday: $("#resetToday"),
-          resetAll: $("#resetAll"),
+      resetToday: $("#resetToday"),
+      resetAll: $("#resetAll"),
 
-          customMlInput: $("#customMlInput"),
-        };
+      customMlInput: $("#customMlInput"),
+    };
 
-        const pad2 = (n) => String(n).padStart(2, "0");
-        const toISODateLocal = (d) =>
-          `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+    const pad2 = (n) => String(n).padStart(2, "0");
+    const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+    const isISODate = (s) => typeof s === "string" && ISO_RE.test(s);
 
-        const addDays = (isoDate, delta) => {
-          const [y, m, day] = isoDate.split("-").map(Number);
-          const d = new Date(y, m - 1, day);
-          d.setDate(d.getDate() + delta);
-          return toISODateLocal(d);
-        };
+    const toISODateLocal = (d) =>
+      `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 
-        const daysBetween = (date1, date2) => {
-          const [y1, m1, d1] = date1.split("-").map(Number);
-          const [y2, m2, d2] = date2.split("-").map(Number);
-          const dt1 = new Date(y1, m1 - 1, d1);
-          const dt2 = new Date(y2, m2 - 1, d2);
-          return Math.round((dt2 - dt1) / (1000 * 60 * 60 * 24)) + 1; // inclusive
-        };
+    // Полдень — чтобы DST/переводы часов не ломали подсчёт дней
+    const dateFromISO = (iso) => {
+      const [y, m, day] = iso.split("-").map(Number);
+      return new Date(y, m - 1, day, 12, 0, 0, 0);
+    };
 
-        const weekdayShort = (isoDate) => {
-          const [y, m, day] = isoDate.split("-").map(Number);
-          const d = new Date(y, m - 1, day);
-          return d
-            .toLocaleDateString("ru-RU", { weekday: "short" })
-            .replace(".", "");
-        };
+    const MS_DAY = 24 * 60 * 60 * 1000;
 
-        const prettyDate = (isoDate) => {
-          const [y, m, day] = isoDate.split("-").map(Number);
-          const d = new Date(y, m - 1, day);
-          return d.toLocaleDateString("ru-RU", {
-            day: "2-digit",
-            month: "2-digit",
-          });
-        };
+    const diffDays = (isoA, isoB) => {
+      if (!isISODate(isoA) || !isISODate(isoB)) return 0;
+      return Math.round((dateFromISO(isoB) - dateFromISO(isoA)) / MS_DAY);
+    };
 
-        const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    const addDays = (isoDate, delta) => {
+      const d = dateFromISO(isoDate);
+      d.setDate(d.getDate() + delta);
+      return toISODateLocal(d);
+    };
 
-        const calcGoalMl = (weightKg, customGoal = 0) => {
-          if (customGoal > 0) return customGoal;
-          const w = Number(weightKg);
-          if (!Number.isFinite(w) || w <= 0) return 0;
-          return Math.round(w * 35);
-        };
+    const daysBetweenInclusive = (isoA, isoB) => {
+      if (!isISODate(isoA) || !isISODate(isoB)) return 1;
+      const d = Math.round((dateFromISO(isoB) - dateFromISO(isoA)) / MS_DAY);
+      return d >= 0 ? d + 1 : 1;
+    };
 
-        const defaults = () => ({
-          firstDate: toISODateLocal(new Date()),
-          weightKg: 70,
-          glassMl: 250,
-          customGoal: 0,
-          todayMl: 0,
-          lastDate: toISODateLocal(new Date()),
-          history: [], // [{date:'YYYY-MM-DD', ml:number, goalMl:number}]
-        });
+    const weekdayShort = (isoDate) => {
+      const d = dateFromISO(isoDate);
+      return d.toLocaleDateString("ru-RU", { weekday: "short" }).replace(".", "");
+    };
 
-        const load = () => {
-          // Migration from v1
-          if (!localStorage.getItem(STORAGE_KEY)) {
-            const oldRaw = localStorage.getItem(OLD_STORAGE_KEY);
-            if (oldRaw) {
-              try {
-                const oldParsed = JSON.parse(oldRaw);
-                const migrated = {
-                  ...defaults(),
-                  weightKg: oldParsed.weightKg || defaults().weightKg,
-                  glassMl: oldParsed.glassMl || defaults().glassMl,
-                  todayMl: oldParsed.todayMl || defaults().todayMl,
-                  lastDate: oldParsed.lastDate || defaults().lastDate,
-                  history: oldParsed.history || defaults().history,
-                };
-                // Set firstDate based on history or lastDate
-                if (migrated.history.length > 0) {
-                  migrated.history.sort((a, b) => a.date.localeCompare(b.date));
-                  migrated.firstDate = migrated.history[0].date;
-                } else {
-                  migrated.firstDate = migrated.lastDate;
-                }
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-              } catch {
-                // If migration fails, use defaults
-              }
-            }
-          }
+    const prettyDate = (isoDate) => {
+      const d = dateFromISO(isoDate);
+      return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
+    };
 
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+    const calcGoalMl = (weightKg, customGoal = 0) => {
+      const cg = Number(customGoal);
+      if (Number.isFinite(cg) && cg > 0) return Math.round(cg);
+
+      const w = Number(weightKg);
+      if (!Number.isFinite(w) || w <= 0) return 0;
+      return Math.round(w * 35);
+    };
+
+    const defaults = () => {
+      const today = toISODateLocal(new Date());
+      return {
+        firstDate: today,
+        weightKg: 70,
+        glassMl: 250,
+        customGoal: 0,
+        todayMl: 0,
+        lastDate: today,
+        history: [], // [{date:'YYYY-MM-DD', ml:number, goalMl:number}]
+      };
+    };
+
+    const dedupeHistoryByDate = (arr) => {
+      const map = new Map();
+      for (const item of arr) {
+        if (item && isISODate(item.date)) map.set(item.date, item);
+      }
+      return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
+    };
+
+    const normalizeFirstDate = () => {
+      const today = toISODateLocal(new Date());
+
+      let first = isISODate(state.firstDate)
+        ? state.firstDate
+        : isISODate(state.lastDate)
+        ? state.lastDate
+        : today;
+
+      if (Array.isArray(state.history) && state.history.length) {
+        const oldest = state.history
+          .map((x) => x.date)
+          .filter(isISODate)
+          .sort()[0];
+        if (oldest && oldest < first) first = oldest;
+      }
+
+      const last = isISODate(state.lastDate) ? state.lastDate : today;
+      if (first > last) first = last;
+
+      state.firstDate = first;
+    };
+
+    const load = () => {
+      // Migration v1 -> v2 (если v2 ещё нет)
+      if (!localStorage.getItem(STORAGE_KEY)) {
+        const oldRaw = localStorage.getItem(OLD_STORAGE_KEY);
+        if (oldRaw) {
           try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return defaults();
-            const parsed = JSON.parse(raw);
-
+            const oldParsed = JSON.parse(oldRaw);
             const d = defaults();
-            const safe = {
-              firstDate:
-                typeof parsed.firstDate === "string"
-                  ? parsed.firstDate
-                  : d.firstDate,
-              weightKg: Number.isFinite(+parsed.weightKg)
-                ? +parsed.weightKg
-                : d.weightKg,
-              glassMl: Number.isFinite(+parsed.glassMl)
-                ? Math.round(+parsed.glassMl)
-                : d.glassMl,
-              customGoal: Number.isFinite(+parsed.customGoal)
-                ? Math.round(+parsed.customGoal)
-                : d.customGoal,
-              todayMl: Number.isFinite(+parsed.todayMl)
-                ? Math.round(+parsed.todayMl)
-                : d.todayMl,
-              lastDate:
-                typeof parsed.lastDate === "string"
-                  ? parsed.lastDate
-                  : d.lastDate,
-              history: Array.isArray(parsed.history)
-                ? parsed.history
-                : d.history,
+            const migrated = {
+              ...d,
+              weightKg: Number.isFinite(+oldParsed.weightKg) ? +oldParsed.weightKg : d.weightKg,
+              glassMl: Number.isFinite(+oldParsed.glassMl) ? Math.round(+oldParsed.glassMl) : d.glassMl,
+              customGoal: Number.isFinite(+oldParsed.customGoal) ? Math.round(+oldParsed.customGoal) : d.customGoal,
+              todayMl: Number.isFinite(+oldParsed.todayMl) ? Math.round(+oldParsed.todayMl) : d.todayMl,
+              lastDate: isISODate(oldParsed.lastDate) ? oldParsed.lastDate : d.lastDate,
+              history: Array.isArray(oldParsed.history) ? oldParsed.history : d.history,
+              firstDate: isISODate(oldParsed.firstDate) ? oldParsed.firstDate : d.firstDate,
             };
 
-            // sanitize
-            safe.weightKg = clamp(safe.weightKg, 20, 250);
-            safe.glassMl = clamp(safe.glassMl, 50, 2000);
-            safe.customGoal = clamp(safe.customGoal, 0, 10000);
-            safe.todayMl = Math.max(0, safe.todayMl);
-
-            safe.history = safe.history
-              .filter((x) => x && typeof x.date === "string")
+            migrated.history = migrated.history
+              .filter((x) => x && isISODate(x.date))
               .map((x) => ({
                 date: x.date,
                 ml: Math.max(0, Math.round(+x.ml || 0)),
                 goalMl: Math.max(0, Math.round(+x.goalMl || 0)),
               }));
 
-            return safe;
-          } catch {
-            return defaults();
-          }
-        };
-
-        const save = () => {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        };
-
-        const dedupeHistoryByDate = (arr) => {
-          const map = new Map();
-          for (const item of arr) map.set(item.date, item);
-          return Array.from(map.values()).sort((a, b) =>
-            a.date.localeCompare(b.date)
-          );
-        };
-
-        const ensureDayRollover = () => {
-          const today = toISODateLocal(new Date());
-          if (state.lastDate !== today) {
-            // push yesterday into history
-            if (state.lastDate) {
-              const goal = calcGoalMl(state.weightKg, state.customGoal);
-              const entry = {
-                date: state.lastDate,
-                ml: state.todayMl,
-                goalMl: goal,
-              };
-              state.history = dedupeHistoryByDate([
-                ...(state.history || []),
-                entry,
-              ]);
-
-              // keep last 30 days
-              state.history = state.history.slice(-30);
+            if (!isISODate(migrated.firstDate)) {
+              migrated.firstDate = migrated.history.length
+                ? migrated.history.slice().sort((a, b) => a.date.localeCompare(b.date))[0].date
+                : migrated.lastDate;
             }
 
-            state.todayMl = 0;
-            state.lastDate = today;
-            save();
-          }
-        };
-
-        const haptic = (pattern = 10) => {
-          if (navigator.vibrate) navigator.vibrate(pattern);
-        };
-
-        const setProgress = (percentVisual) => {
-          document.documentElement.style.setProperty(
-            "--p",
-            String(percentVisual)
-          );
-        };
-
-        const render = () => {
-          ensureDayRollover();
-
-          const goal = calcGoalMl(state.weightKg, state.customGoal);
-          const current = state.todayMl;
-
-          const rawPercent = goal > 0 ? Math.round((current / goal) * 100) : 0;
-          const shownPercent = Number.isFinite(rawPercent) ? rawPercent : 0;
-          const visualPercent = clamp(shownPercent, 0, 100);
-
-          setProgress(visualPercent);
-
-          els.percent.textContent = `${shownPercent}%`;
-          els.amount.textContent = `${current} / ${goal} ml`;
-          els.goalNote.textContent = `Цель: ${goal} ml • Стакан: ${state.glassMl} ml`;
-
-          // hint dynamics
-          if (current === 0)
-            els.hintText.textContent =
-              "+ добавляет стакан, или укажите вручную";
-          else if (shownPercent >= 100)
-            els.hintText.textContent = "Цель достигнута! Можно + по желанию";
-          else
-            els.hintText.textContent = "+ / - стакан, или кастомное количество";
-
-          // streak and total days on main screen
-          const { currentStreak, maxStreak } = calculateStreaks();
-          const totalDays = daysBetween(state.firstDate, state.lastDate);
-          els.streakInfo.textContent = `Серия: ${currentStreak} дней (макс: ${maxStreak}) • Всего дней: ${totalDays}`;
-
-          // settings modal values
-          els.settingsGoal.textContent = `${goal} мл/день`;
-        };
-
-        const openModal = (modalEl) => {
-          modalEl.classList.add("is-open");
-          document.body.style.overflow = "hidden";
-        };
-
-        const closeModal = (modalEl) => {
-          modalEl.classList.remove("is-open");
-          document.body.style.overflow = "";
-        };
-
-        const isOpen = (modalEl) => modalEl.classList.contains("is-open");
-
-        const onOverlayClickToClose = (modalEl, ev) => {
-          if (ev.target === modalEl) closeModal(modalEl);
-        };
-
-        const formatMl = (n) => `${Math.round(n)} ml`;
-
-        const buildHistory = (maxDays = 30) => {
-          const today = toISODateLocal(new Date());
-          const goalToday = calcGoalMl(state.weightKg, state.customGoal);
-
-          const map = new Map((state.history || []).map((x) => [x.date, x]));
-          const days = [];
-
-          for (let i = maxDays - 1; i >= 0; i--) {
-            const date = addDays(today, -i);
-            if (date === today) {
-              days.push({
-                date,
-                ml: state.todayMl,
-                goalMl: goalToday,
-                isToday: true,
-              });
-            } else {
-              const entry = map.get(date);
-              days.push({
-                date,
-                ml: entry ? entry.ml : 0,
-                goalMl: entry ? entry.goalMl || goalToday : goalToday,
-                isToday: false,
-              });
-            }
-          }
-          return days;
-        };
-
-        const calculateStreaks = () => {
-          const days = buildHistory().reverse(); // from oldest to newest
-          let currentStreak = 0;
-          let maxStreak = 0;
-          let tempStreak = 0;
-
-          for (const d of days) {
-            const pct = d.goalMl > 0 ? (d.ml / d.goalMl) * 100 : 0;
-            if (pct >= 100) {
-              tempStreak++;
-              if (d.isToday) currentStreak = tempStreak; // only count current if today is achieved
-            } else {
-              maxStreak = Math.max(maxStreak, tempStreak);
-              tempStreak = 0;
-            }
-          }
-          maxStreak = Math.max(maxStreak, tempStreak);
-
-          if (days[days.length - 1].isToday) {
-            const todayPct =
-              days[days.length - 1].goalMl > 0
-                ? (days[days.length - 1].ml / days[days.length - 1].goalMl) *
-                  100
-                : 0;
-            if (todayPct < 100) currentStreak = 0; // reset current if today not achieved
-          }
-
-          return { currentStreak, maxStreak };
-        };
-
-        const renderStats = () => {
-          ensureDayRollover();
-
-          const days = buildHistory();
-          els.statsList.innerHTML = "";
-
-          let total = 0;
-          let hits = 0;
-          let totalDaysWithData = 0;
-
-          for (const d of days) {
-            const pct = d.goalMl > 0 ? Math.round((d.ml / d.goalMl) * 100) : 0;
-            const w = clamp(pct, 0, 100);
-
-            total += d.ml;
-            if (d.ml > 0) totalDaysWithData++;
-            if (pct >= 100) hits++;
-
-            const row = document.createElement("div");
-            row.className = "statrow";
-            row.innerHTML = `
-            <div class="date">
-              ${d.isToday ? "сегодня" : weekdayShort(d.date)}
-              <b>${prettyDate(d.date)}</b>
-            </div>
-            <div>
-              <div class="bar" aria-hidden="true"><i style="width:${w}%"></i></div>
-              <div class="meta">
-                <span><strong>${d.ml}</strong> ml</span>
-                <span>${formatMl(d.goalMl)} • ${pct}%</span>
-              </div>
-            </div>
-          `;
-            els.statsList.appendChild(row);
-          }
-
-          const avg =
-            totalDaysWithData > 0 ? Math.round(total / totalDaysWithData) : 0;
-          const { currentStreak, maxStreak } = calculateStreaks();
-          els.statsSummary.textContent = `Итого: ${total} ml • Среднее: ${avg} ml/день • Дней 100%: ${hits} • Серия: ${currentStreak} (макс: ${maxStreak})`;
-        };
-
-        // ===== State =====
-        let state = load();
-        ensureDayRollover();
-        save();
-        render();
-
-        // ===== Main actions =====
-        const addWater = (ml) => {
-          ensureDayRollover();
-          state.todayMl = Math.max(0, state.todayMl + ml);
-          save();
-          render();
-          haptic(12);
-        };
-
-        const removeGlass = () => {
-          ensureDayRollover();
-          state.todayMl = Math.max(0, state.todayMl - state.glassMl);
-          save();
-          render();
-          haptic(8);
-        };
-
-        els.plusBtn.addEventListener("click", () => addWater(state.glassMl));
-        els.minusBtn.addEventListener("click", removeGlass);
-
-        // ===== Custom Add =====
-        const openCustom = () => {
-          els.customMlInput.value = "";
-          openModal(els.customModal);
-          els.customMlInput.focus();
-        };
-
-        const closeCustom = () => closeModal(els.customModal);
-
-        const saveCustom = () => {
-          const ml = clamp(
-            Math.round(parseFloat(els.customMlInput.value || "0")),
-            50,
-            5000
-          );
-          if (Number.isFinite(ml) && ml > 0) {
-            addWater(ml);
-            closeCustom();
-          }
-        };
-
-        els.customBtn.addEventListener("click", openCustom);
-        els.customClose.addEventListener("click", closeCustom);
-        els.customCancel.addEventListener("click", closeCustom);
-        els.customSave.addEventListener("click", saveCustom);
-        els.customModal.addEventListener("click", (ev) =>
-          onOverlayClickToClose(els.customModal, ev)
-        );
-
-        // ===== Settings =====
-        let draftSettings = null;
-
-        const openSettings = () => {
-          ensureDayRollover();
-          draftSettings = {
-            weightKg: state.weightKg,
-            glassMl: state.glassMl,
-            customGoal: state.customGoal,
-          };
-          els.weightInput.value = String(draftSettings.weightKg);
-          els.glassInput.value = String(draftSettings.glassMl);
-          els.customGoalInput.value =
-            draftSettings.customGoal > 0
-              ? String(draftSettings.customGoal)
-              : "";
-
-          els.settingsGoal.textContent = `${calcGoalMl(
-            draftSettings.weightKg,
-            draftSettings.customGoal
-          )} мл/день`;
-
-          openModal(els.settingsModal);
-        };
-
-        const closeSettings = () => {
-          draftSettings = null;
-          closeModal(els.settingsModal);
-        };
-
-        const saveSettings = () => {
-          const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
-          const g = clamp(
-            Math.round(parseFloat(els.glassInput.value || "0")),
-            50,
-            2000
-          );
-          const cg = clamp(
-            Math.round(parseFloat(els.customGoalInput.value || "0")),
-            0,
-            10000
-          );
-
-          state.weightKg = Number.isFinite(w) ? w : state.weightKg;
-          state.glassMl = Number.isFinite(g) ? g : state.glassMl;
-          state.customGoal = Number.isFinite(cg) ? cg : state.customGoal;
-
-          save();
-          render();
-          closeSettings();
-          haptic([8, 18, 8]);
-        };
-
-        els.settingsBtn.addEventListener("click", openSettings);
-        els.settingsClose.addEventListener("click", closeSettings);
-        els.settingsCancel.addEventListener("click", closeSettings);
-        els.settingsSave.addEventListener("click", saveSettings);
-        els.settingsModal.addEventListener("click", (ev) =>
-          onOverlayClickToClose(els.settingsModal, ev)
-        );
-
-        const updateDraftGoal = () => {
-          const w = clamp(parseFloat(els.weightInput.value || "0"), 20, 250);
-          const cg = clamp(
-            Math.round(parseFloat(els.customGoalInput.value || "0")),
-            0,
-            10000
-          );
-          els.settingsGoal.textContent = `${calcGoalMl(w, cg)} мл/день`;
-        };
-
-        els.weightInput.addEventListener("input", updateDraftGoal);
-        els.customGoalInput.addEventListener("input", updateDraftGoal);
-
-        // ===== Stats =====
-        const openStats = () => {
-          renderStats();
-          openModal(els.statsModal);
-        };
-
-        const closeStats = () => closeModal(els.statsModal);
-
-        els.statsBtn.addEventListener("click", openStats);
-        els.statsClose.addEventListener("click", closeStats);
-        els.statsModal.addEventListener("click", (ev) =>
-          onOverlayClickToClose(els.statsModal, ev)
-        );
-
-        // Reset today
-        els.resetToday.addEventListener("click", () => {
-          ensureDayRollover();
-          const ok = confirm(
-            "Сбросить выпитое за сегодня? Это не удалит историю."
-          );
-          if (!ok) return;
-          state.todayMl = 0;
-          save();
-          render();
-          renderStats();
-          haptic([10, 40, 10]);
-        });
-
-        // Reset all
-        els.resetAll.addEventListener("click", () => {
-          const ok = confirm(
-            "Сбросить все данные? Это удалит историю, настройки и статистику."
-          );
-          if (!ok) return;
-          const d = defaults();
-          state = d;
-          save();
-          render();
-          renderStats();
-          haptic([12, 30, 12, 30, 12]);
-        });
-
-        // ===== Keyboard (Esc) =====
-        window.addEventListener("keydown", (ev) => {
-          if (ev.key === "Escape") {
-            if (isOpen(els.statsModal)) closeStats();
-            if (isOpen(els.settingsModal)) closeSettings();
-            if (isOpen(els.customModal)) closeCustom();
-          }
-        });
-
-        // ===== Parallax / Depth (mouse + deviceorientation) =====
-        const setParallax = (nx, ny) => {
-          const px = clamp(nx, -1, 1) * 10;
-          const py = clamp(ny, -1, 1) * 10;
-          document.documentElement.style.setProperty("--parx", `${px}px`);
-          document.documentElement.style.setProperty("--pary", `${py}px`);
-          document.documentElement.style.setProperty(
-            "--tilt",
-            `${(-nx * 0.6).toFixed(2)}deg`
-          );
-        };
-
-        // mouse (desktop)
-        window.addEventListener(
-          "mousemove",
-          (ev) => {
-            const w = window.innerWidth || 1;
-            const h = window.innerHeight || 1;
-            const nx = (ev.clientX / w) * 2 - 1;
-            const ny = (ev.clientY / h) * 2 - 1;
-            setParallax(nx, ny);
-          },
-          { passive: true }
-        );
-
-        // device orientation (mobile)
-        const attachDeviceOrientation = () => {
-          window.addEventListener(
-            "deviceorientation",
-            (ev) => {
-              const gamma = Number.isFinite(ev.gamma) ? ev.gamma : 0;
-              const beta = Number.isFinite(ev.beta) ? ev.beta : 0;
-
-              const nx = clamp(gamma / 35, -1, 1);
-              const ny = clamp(beta / 45, -1, 1);
-              setParallax(nx, ny);
-            },
-            { passive: true }
-          );
-        };
-
-        // iOS needs permission
-        const maybeEnableMotion = async () => {
-          try {
-            if (
-              typeof DeviceOrientationEvent !== "undefined" &&
-              typeof DeviceOrientationEvent.requestPermission === "function"
-            ) {
-              const res = await DeviceOrientationEvent.requestPermission();
-              if (res === "granted") attachDeviceOrientation();
-            } else {
-              attachDeviceOrientation();
-            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
           } catch {
             // ignore
           }
+        }
+      }
+
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaults();
+
+        const parsed = JSON.parse(raw);
+        const d = defaults();
+
+        const safe = {
+          firstDate: isISODate(parsed.firstDate) ? parsed.firstDate : d.firstDate,
+          weightKg: Number.isFinite(+parsed.weightKg) ? +parsed.weightKg : d.weightKg,
+          glassMl: Number.isFinite(+parsed.glassMl) ? Math.round(+parsed.glassMl) : d.glassMl,
+          customGoal: Number.isFinite(+parsed.customGoal) ? Math.round(+parsed.customGoal) : d.customGoal,
+          todayMl: Number.isFinite(+parsed.todayMl) ? Math.round(+parsed.todayMl) : d.todayMl,
+          lastDate: isISODate(parsed.lastDate) ? parsed.lastDate : d.lastDate,
+          history: Array.isArray(parsed.history) ? parsed.history : d.history,
         };
 
-        const once = { once: true, passive: true };
-        window.addEventListener("pointerdown", maybeEnableMotion, once);
-        window.addEventListener("touchstart", maybeEnableMotion, once);
+        safe.weightKg = clamp(safe.weightKg, 20, 250);
+        safe.glassMl = clamp(safe.glassMl, 50, 2000);
+        safe.customGoal = clamp(safe.customGoal, 0, 10000);
+        safe.todayMl = Math.max(0, safe.todayMl);
 
-        // ===== Midnight safety check =====
-        setInterval(() => {
-          const before = state.lastDate;
-          ensureDayRollover();
-          if (state.lastDate !== before) {
-            render();
-            if (isOpen(els.statsModal)) renderStats();
-          }
-        }, 30_000);
-      })();
-    </script>
+        safe.history = safe.history
+          .filter((x) => x && isISODate(x.date))
+          .map((x) => ({
+            date: x.date,
+            ml: Math.max(0, Math.round(+x.ml || 0)),
+            goalMl: Math.max(0, Math.round(+x.goalMl || 0)),
+          }));
+
+        safe.history = dedupeHistoryByDate(safe.history);
+
+        return safe;
+      } catch {
+        return defaults();
+      }
+    };
+
+    const save = () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    };
+
+    // FIX: перенос дня с учётом пропущенных дней + защита от битых дат
+    const ensureDayRollover = () => {
+      const today = toISODateLocal(new Date());
+
+      if (!isISODate(state.lastDate)) {
+        state.lastDate = today;
+        state.todayMl = 0;
+        normalizeFirstDate();
+        save();
+        return;
+      }
+
+      const gap = diffDays(state.lastDate, today);
+
+      // lastDate в будущем (битые данные) — выровняем
+      if (gap < 0) {
+        state.lastDate = today;
+        state.todayMl = 0;
+        normalizeFirstDate();
+        save();
+        return;
+      }
+
+      if (gap === 0) {
+        normalizeFirstDate();
+        return;
+      }
+
+      const goal = calcGoalMl(state.weightKg, state.customGoal);
+      const map = new Map((state.history || []).map((x) => [x.date, x]));
+
+      // записываем lastDate с фактическим todayMl
+      map.set(state.lastDate, {
+        date: state.lastDate,
+        ml: state.todayMl,
+        goalMl: goal,
+      });
+
+      // если пропущено несколько дней — добавим промежуточные (0 ml), если их нет
+      for (let i = 1; i < gap; i++) {
+        const date = addDays(state.lastDate, i);
+        if (date === today) break;
+        if (!map.has(date)) map.set(date, { date, ml: 0, goalMl: goal });
+      }
+
+      state.history = Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
+      state.history = state.history.slice(-30);
+
+      state.todayMl = 0;
+      state.lastDate = today;
+
+      normalizeFirstDate();
+      save();
+    };
+
+    const haptic = (pattern = 10) => {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    };
+
+    const setProgress = (percentVisual) => {
+      document.documentElement.style.setProperty("--p", String(percentVisual));
+    };
+
+    const formatMl = (n) => `${Math.round(n)} ml`;
+
+    const buildHistory = (maxDays = 30) => {
+      const today = toISODateLocal(new Date());
+      const goalToday = calcGoalMl(state.weightKg, state.customGoal);
+
+      const map = new Map((state.history || []).map((x) => [x.date, x]));
+      const days = [];
+
+      // строго от старых к новым
+      for (let i = maxDays - 1; i >= 0; i--) {
+        const date = addDays(today, -i);
+        if (date === today) {
+          days.push({ date, ml: state.todayMl, goalMl: goalToday, isToday: true });
+        } else {
+          const entry = map.get(date);
+          const entryGoal =
+            entry && Number.isFinite(+entry.goalMl) && +entry.goalMl > 0 ? +entry.goalMl : goalToday;
+
+          days.push({
+            date,
+            ml: entry ? entry.ml : 0,
+            goalMl: entryGoal,
+            isToday: false,
+          });
+        }
+      }
+      return days;
+    };
+
+    // FIX: серия считается корректно (без reverse-ошибки и без "вечных нулей")
+    const calculateStreaks = () => {
+      const days = buildHistory(); // oldest -> newest
+      const isHit = (ml, goalMl) => goalMl > 0 && ml >= goalMl;
+
+      // max streak
+      let maxStreak = 0;
+      let temp = 0;
+      for (const d of days) {
+        if (isHit(d.ml, d.goalMl)) {
+          temp++;
+          if (temp > maxStreak) maxStreak = temp;
+        } else {
+          temp = 0;
+        }
+      }
+
+      // current streak: если сегодня не 100%, считаем подряд до вчера
+      let currentStreak = 0;
+      let idx = days.length - 1; // today
+      if (idx < 0) return { currentStreak: 0, maxStreak: 0 };
+
+      const todayHit = isHit(days[idx].ml, days[idx].goalMl);
+      idx = todayHit ? idx : idx - 1;
+
+      while (idx >= 0 && isHit(days[idx].ml, days[idx].goalMl)) {
+        currentStreak++;
+        idx--;
+      }
+
+      return { currentStreak, maxStreak };
+    };
+
+    const render = () => {
+      ensureDayRollover();
+
+      const goal = calcGoalMl(state.weightKg, state.customGoal);
+      const current = state.todayMl;
+
+      const rawPercent = goal > 0 ? Math.round((current / goal) * 100) : 0;
+      const shownPercent = Number.isFinite(rawPercent) ? rawPercent : 0;
+      const visualPercent = clamp(shownPercent, 0, 100);
+
+      setProgress(visualPercent);
+
+      els.percent.textContent = `${shownPercent}%`;
+      els.amount.textContent = `${current} / ${goal} ml`;
+      els.goalNote.textContent = `Цель: ${goal} ml • Стакан: ${state.glassMl} ml`;
+
+      if (current === 0) els.hintText.textContent = "+ добавляет стакан, или укажите вручную";
+      else if (shownPercent >= 100) els.hintText.textContent = "Цель достигнута! Можно + по желанию";
+      else els.hintText.textContent = "+ / - стакан, или кастомное количество";
+
+      const { currentStreak, maxStreak } = calculateStreaks();
+      const totalDays = Math.max(1, daysBetweenInclusive(state.firstDate, state.lastDate));
+      els.streakInfo.textContent = `Серия: ${currentStreak} дней (макс: ${maxStreak}) • Всего дней: ${totalDays}`;
+
+      els.settingsGoal.textContent = `${goal} мл/день`;
+    };
+
+    const openModal = (modalEl) => {
+      modalEl.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+    };
+
+    const closeModal = (modalEl) => {
+      modalEl.classList.remove("is-open");
+      document.body.style.overflow = "";
+    };
+
+    const isOpen = (modalEl) => modalEl.classList.contains("is-open");
+
+    const onOverlayClickToClose = (modalEl, ev) => {
+      if (ev.target === modalEl) closeModal(modalEl);
+    };
+
+    const renderStats = () => {
+      ensureDayRollover();
+
+      const days = buildHistory();
+      els.statsList.innerHTML = "";
+
+      let total = 0;
+      let hits = 0;
+      let totalDaysWithData = 0;
+
+      for (const d of days) {
+        const pct = d.goalMl > 0 ? Math.round((d.ml / d.goalMl) * 100) : 0;
+        const w = clamp(pct, 0, 100);
+
+        total += d.ml;
+        if (d.ml > 0) totalDaysWithData++;
+        if (pct >= 100) hits++;
+
+        const row = document.createElement("div");
+        row.className = "statrow";
+        row.innerHTML = `
+          <div class="date">
+            ${d.isToday ? "сегодня" : weekdayShort(d.date)}
+            <b>${prettyDate(d.date)}</b>
+          </div>
+          <div>
+            <div class="bar" aria-hidden="true"><i style="width:${w}%"></i></div>
+            <div class="meta">
+              <span><strong>${d.ml}</strong> ml</span>
+              <span>${formatMl(d.goalMl)} • ${pct}%</span>
+            </div>
+          </div>
+        `;
+        els.statsList.appendChild(row);
+      }
+
+      const avg = totalDaysWithData > 0 ? Math.round(total / totalDaysWithData) : 0;
+      const { currentStreak, maxStreak } = calculateStreaks();
+      els.statsSummary.textContent = `Итого: ${total} ml • Среднее: ${avg} ml/день • Дней 100%: ${hits} • Серия: ${currentStreak} (макс: ${maxStreak})`;
+    };
+
+    // ===== State =====
+    let state = load();
+    normalizeFirstDate();
+    ensureDayRollover();
+    save();
+    render();
+
+    // ===== Main actions =====
+    const addWater = (ml) => {
+      ensureDayRollover();
+      state.todayMl = Math.max(0, state.todayMl + ml);
+      save();
+      render();
+      haptic(12);
+    };
+
+    const removeGlass = () => {
+      ensureDayRollover();
+      state.todayMl = Math.max(0, state.todayMl - state.glassMl);
+      save();
+      render();
+      haptic(8);
+    };
+
+    els.plusBtn.addEventListener("click", () => addWater(state.glassMl));
+    els.minusBtn.addEventListener("click", removeGlass);
+
+    // ===== Custom Add =====
+    const openCustom = () => {
+      els.customMlInput.value = "";
+      openModal(els.customModal);
+      els.customMlInput.focus();
+    };
+
+    const closeCustom = () => closeModal(els.customModal);
+
+    // FIX: пустое/NaN не превращается в 50 ml
+    const saveCustom = () => {
+      const raw = parseFloat(els.customMlInput.value);
+      if (!Number.isFinite(raw)) return;
+
+      const ml = clamp(Math.round(raw), 50, 5000);
+      if (ml > 0) {
+        addWater(ml);
+        closeCustom();
+      }
+    };
+
+    els.customBtn.addEventListener("click", openCustom);
+    els.customClose.addEventListener("click", closeCustom);
+    els.customCancel.addEventListener("click", closeCustom);
+    els.customSave.addEventListener("click", saveCustom);
+    els.customModal.addEventListener("click", (ev) => onOverlayClickToClose(els.customModal, ev));
+
+    els.customMlInput.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") saveCustom();
+    });
+
+    // ===== Settings =====
+    let draftSettings = null;
+
+    const openSettings = () => {
+      ensureDayRollover();
+      draftSettings = {
+        weightKg: state.weightKg,
+        glassMl: state.glassMl,
+        customGoal: state.customGoal,
+      };
+
+      els.weightInput.value = String(draftSettings.weightKg);
+      els.glassInput.value = String(draftSettings.glassMl);
+      els.customGoalInput.value = draftSettings.customGoal > 0 ? String(draftSettings.customGoal) : "";
+
+      els.settingsGoal.textContent = `${calcGoalMl(draftSettings.weightKg, draftSettings.customGoal)} мл/день`;
+      openModal(els.settingsModal);
+    };
+
+    const closeSettings = () => {
+      draftSettings = null;
+      closeModal(els.settingsModal);
+    };
+
+    // FIX: пустые поля не затирают настройки в минимумы; пустая ручная цель = 0 (сброс)
+    const saveSettings = () => {
+      const wRaw = parseFloat(els.weightInput.value);
+      const gRaw = parseFloat(els.glassInput.value);
+      const cgRaw = parseFloat(els.customGoalInput.value);
+
+      const w = Number.isFinite(wRaw) ? clamp(wRaw, 20, 250) : state.weightKg;
+      const g = Number.isFinite(gRaw) ? clamp(Math.round(gRaw), 50, 2000) : state.glassMl;
+      const cg = Number.isFinite(cgRaw) ? clamp(Math.round(cgRaw), 0, 10000) : 0;
+
+      state.weightKg = w;
+      state.glassMl = g;
+      state.customGoal = cg;
+
+      save();
+      render();
+      closeSettings();
+      haptic([8, 18, 8]);
+    };
+
+    els.settingsBtn.addEventListener("click", openSettings);
+    els.settingsClose.addEventListener("click", closeSettings);
+    els.settingsCancel.addEventListener("click", closeSettings);
+    els.settingsSave.addEventListener("click", saveSettings);
+    els.settingsModal.addEventListener("click", (ev) => onOverlayClickToClose(els.settingsModal, ev));
+
+    const updateDraftGoal = () => {
+      const wRaw = parseFloat(els.weightInput.value);
+      const cgRaw = parseFloat(els.customGoalInput.value);
+
+      const w = Number.isFinite(wRaw) ? clamp(wRaw, 20, 250) : state.weightKg;
+      const cg = Number.isFinite(cgRaw) ? clamp(Math.round(cgRaw), 0, 10000) : 0;
+
+      els.settingsGoal.textContent = `${calcGoalMl(w, cg)} мл/день`;
+    };
+
+    els.weightInput.addEventListener("input", updateDraftGoal);
+    els.customGoalInput.addEventListener("input", updateDraftGoal);
+
+    // ===== Stats =====
+    const openStats = () => {
+      renderStats();
+      openModal(els.statsModal);
+    };
+
+    const closeStats = () => closeModal(els.statsModal);
+
+    els.statsBtn.addEventListener("click", openStats);
+    els.statsClose.addEventListener("click", closeStats);
+    els.statsModal.addEventListener("click", (ev) => onOverlayClickToClose(els.statsModal, ev));
+
+    els.resetToday.addEventListener("click", () => {
+      ensureDayRollover();
+      const ok = confirm("Сбросить выпитое за сегодня? Это не удалит историю.");
+      if (!ok) return;
+      state.todayMl = 0;
+      save();
+      render();
+      renderStats();
+      haptic([10, 40, 10]);
+    });
+
+    els.resetAll.addEventListener("click", () => {
+      const ok = confirm("Сбросить все данные? Это удалит историю, настройки и статистику.");
+      if (!ok) return;
+      state = defaults();
+      save();
+      render();
+      renderStats();
+      haptic([12, 30, 12, 30, 12]);
+    });
+
+    // ===== Keyboard (Esc) =====
+    window.addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape") {
+        if (isOpen(els.statsModal)) closeStats();
+        if (isOpen(els.settingsModal)) closeSettings();
+        if (isOpen(els.customModal)) closeCustom();
+      }
+    });
+
+    // ===== Parallax / Depth (mouse + deviceorientation) =====
+    const setParallax = (nx, ny) => {
+      const px = clamp(nx, -1, 1) * 10;
+      const py = clamp(ny, -1, 1) * 10;
+      document.documentElement.style.setProperty("--parx", `${px}px`);
+      document.documentElement.style.setProperty("--pary", `${py}px`);
+      document.documentElement.style.setProperty("--tilt", `${(-nx * 0.6).toFixed(2)}deg`);
+    };
+
+    window.addEventListener(
+      "mousemove",
+      (ev) => {
+        const w = window.innerWidth || 1;
+        const h = window.innerHeight || 1;
+        const nx = (ev.clientX / w) * 2 - 1;
+        const ny = (ev.clientY / h) * 2 - 1;
+        setParallax(nx, ny);
+      },
+      { passive: true }
+    );
+
+    const attachDeviceOrientation = () => {
+      window.addEventListener(
+        "deviceorientation",
+        (ev) => {
+          const gamma = Number.isFinite(ev.gamma) ? ev.gamma : 0;
+          const beta = Number.isFinite(ev.beta) ? ev.beta : 0;
+
+          const nx = clamp(gamma / 35, -1, 1);
+          const ny = clamp(beta / 45, -1, 1);
+          setParallax(nx, ny);
+        },
+        { passive: true }
+      );
+    };
+
+    const maybeEnableMotion = async () => {
+      try {
+        if (
+          typeof DeviceOrientationEvent !== "undefined" &&
+          typeof DeviceOrientationEvent.requestPermission === "function"
+        ) {
+          const res = await DeviceOrientationEvent.requestPermission();
+          if (res === "granted") attachDeviceOrientation();
+        } else {
+          attachDeviceOrientation();
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    const once = { once: true, passive: true };
+    window.addEventListener("pointerdown", maybeEnableMotion, once);
+    window.addEventListener("touchstart", maybeEnableMotion, once);
+
+    // ===== Midnight safety check =====
+    setInterval(() => {
+      const before = state.lastDate;
+      ensureDayRollover();
+      if (state.lastDate !== before) {
+        render();
+        if (isOpen(els.statsModal)) renderStats();
+      }
+    }, 30_000);
+  })();
+</script>
+
   </body>
 </html>
+
